@@ -1,179 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chenglin Pua</title>
-    <meta name="description" content="Chenglin Pua personal website and research portfolio covering imaging alien samples, light element studies, personal life, and published articles.">
-    <meta name="keywords" content="research, science, electron ptychography, microscopy, personal, portfolio, articles, gallery, education, presentations, awards">
-    <meta name="author" content="Chenglin Pua">
-    <link rel="icon" href="https://placehold.co/32x32/1D4ED8/FFFFFF?text=P">
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s;
-        }
-        /* Custom scrollbar style for modern browsers */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    // Set Firestore log level for debugging
+    setLogLevel('debug');
 
-        .content-editable-field:hover {
-            /* Highlight editable fields with the current theme color */
-            outline: 2px solid var(--theme-color-500, #3b82f6);
-            cursor: text;
-        }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
+    // --- GLOBAL VARIABLES & INITIALIZATION ---
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    <header class="shadow-lg sticky top-0 z-50 transition-colors duration-300" id="header" style="background-color: var(--theme-color-800, #1e40af);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
-            <h1 class="text-3xl font-extrabold tracking-tight text-white">Chenglin Pua</h1>
-            <nav class="hidden md:flex space-x-6">
-                <a href="#research" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
-                <a href="#education" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Education</a>
-                <a href="#presentations" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Presentations</a>
-                <a href="#awards" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Awards</a>
-                <a href="#personal" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
-                <a href="#gallery" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
-                <a href="#articles" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
-            </nav>
+    let app, db, auth, userId = null;
+    let isAuthReady = false;
+    let isEditMode = false;
+    let themeColorHex = '#3B82F6'; // Default Tailwind Indigo 500
 
-        </div>
-    </header>
+    const CONFIG_PATH = (uid) => `artifacts/${appId}/users/${uid}/website_settings/settings`;
+    const CONTENT_PATH = `artifacts/${appId}/public/data/website_content/main_data`;
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
-
-        <div id="loading-indicator" class="text-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto" style="border-color: var(--theme-color-600, #4f46e5);"></div>
-            <p class="mt-4 text-lg text-gray-600">Loading website content...</p>
-        </div>
-
-        <section id="research" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview</h2>
-
-            <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
-                <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
-                <p id="research-main-intro" class="text-gray-600 leading-relaxed min-h-[50px] content-editable-field" data-key="research.main_intro">
-                    Hello world! I am a PhD candidate (Malaysian) in Materials Science at Tsinghua University, specializing in advanced electron microscopy techniques. My research focuses on scanning transmission electron microscopy (STEM), with a particular emphasis on multi-slice electron ptychography (MEP). Previously, I have worked on the structural analysis of offshore launching platforms during my bachelor’s studies and conducted atomic-scale characterization of 2D materials. 
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8" id="research-sub-topics">
-                </div>
-        </section>
-        
-        <section id="education" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🎓 Education</h2>
-            <div class="space-y-4" id="education-list">
-                </div>
-        </section>
-        
-        <section id="presentations" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🗣️ Presentations</h2>
-            <div class="space-y-4" id="presentations-list">
-                </div>
-        </section>
-        
-        <section id="awards" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🏆 Honors & Awards</h2>
-            <div class="space-y-4" id="honors-list">
-                </div>
-        </section>
-
-        <section id="personal" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
-
-            <div class="space-y-10" id="personal-life-memories">
-                </div>
-        </section>
-
-        <section id="gallery" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums)</h2>
-
-            <div class="space-y-10" id="gallery-albums">
-                </div>
-        </section>
-
-        <section id="articles" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts</h2>
-
-            <div class="space-y-4" id="article-list">
-                </div>
-        </section>
-    </main>
-
-    <footer class="mt-16 py-8" style="background-color: var(--theme-color-800, #1e40af);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div id="social-links-container" class="flex justify-center space-x-6 mb-4">
-                </div>
-            <p class="text-white text-sm">&copy; <span id="current-year"></span> Chenglin Pua. Built with Firebase and Tailwind CSS.</p>
-        </div>
-    </footer>
-
-    <div id="config-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
-            <h3 class="text-2xl font-bold mb-6" style="color: var(--theme-color-700, #3730a3);">Website Configuration</h3>
-            <div class="space-y-4">
-                <div>
-                    <label for="color-picker" class="block text-sm font-medium text-gray-700 mb-2">Primary Theme Color (Tailwind Color Scale)</label>
-                    <input type="color" id="color-picker" class="w-full h-10 border border-gray-300 rounded-lg p-1">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">User ID (For other users to find you)</label>
-                    <p id="user-id-display" class="break-all bg-gray-100 p-2 rounded-lg text-sm font-mono"></p>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="saveThemeColor()" class="px-4 py-2 font-medium rounded-lg text-white" style="background-color: var(--theme-color-600, #4f46e5); hover-bg-color: var(--theme-color-700, #3730a3);">
-                    Save Settings
-                </button>
-                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="px-4 py-2 font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Set Firestore log level for debugging
-        setLogLevel('debug');
-
-        // --- GLOBAL VARIABLES & INITIALIZATION ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app, db, auth, userId = null;
-        let isAuthReady = false;
-        let isEditMode = false;
-        let themeColorHex = '#3B82F6'; // Default Tailwind Indigo 500
-
-        const CONFIG_PATH = (uid) => `artifacts/${appId}/users/${uid}/website_settings/settings`;
-        const CONTENT_PATH = `artifacts/${appId}/public/data/website_content/main_data`;
-
-        // --- DATA STRUCTURE & INITIAL DATA ---
-        const initialContent = {
-            research: {
-                main_intro: "Hello world! I am a PhD candidate (Malaysian) in Materials Science at Tsinghua University, specializing in advanced electron microscopy techniques. My research focuses on scanning transmission electron microscopy (STEM), with a particular emphasis on multi-slice electron ptychography (MEP). Previously, I have worked on the structural analysis of offshore launching platforms during my bachelor’s studies and conducted atomic-scale characterization of 2D materials.",
-                sub_topics: [
-                    { title: "Imaging Lunar Samples", content: "What do solar flare tracks look like" },
-                    { title: "Imaging Hydrogen Atoms", content: "Better atomic scale imaging of hydrogens" },
-                    { title: "Offshore Launching Platform", content: "Influence of hydrogen combustion and its mitigation on offshore launch platforms" }
-                ]
-            },
-            // NEW SECTIONS START HERE
+    // --- DATA STRUCTURE & INITIAL DATA ---
+    const initialContent = {
+        research: {
+            main_intro: "Hello world! I am a PhD candidate (Malaysian) in Materials Science at Tsinghua University, specializing in advanced electron microscopy techniques. My research focuses on scanning transmission electron microscopy (STEM), with a particular emphasis on multi-slice electron ptychography (MEP). Previously, I have worked on the structural analysis of offshore launching platforms during my bachelor’s studies and conducted atomic-scale characterization of 2D materials.",
+            sub_topics: [
+                // MODIFIED: Added image_url field
+                { title: "Imaging Lunar Samples", content: "What do solar flare tracks look like", image_url: "https://placehold.co/400x400/312E81/FFFFFF?text=Lunar+Sample" },
+                { title: "Imaging Hydrogen Atoms", content: "Better atomic scale imaging of hydrogens", image_url: "https://placehold.co/400x400/312E81/FFFFFF?text=Hydrogen+Atom" },
+                { title: "Offshore Launching Platform", content: "Influence of hydrogen combustion and its mitigation on offshore launch platforms", image_url: "https://placehold.co/400x400/312E81/FFFFFF?text=Launch+Platform" }
+            ]
+        },
             education: [
                 { degree: "Ph.D. in Materials Science", school: "Tsinghua University", years: "2025 - 2028" },
                 { degree: "M.S. in Materials Science", school: "Tsinghua University", years: "2022 - 2025" },
@@ -187,463 +44,465 @@
                 { title: "Interview from China Daily", year: "2023" },
                 { title: "Outstanding Undergraduate Thesis", year: "2022" }
             ],
-            // NEW SECTIONS END HERE
-            personal_life: [
-                { title: "Japan Kyoto", content: "It was my first time in Japan, and I was incredibly lucky to meet my idol, Jay Chou, while I was there!", images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/jay_chou.jpg","https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/tokyo_japan.jpg"] },
-                { title: "USA Silicon Valley", content: "Photos from my trip to Silicon Valley, USA, during November 2024.", images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/jay_chou.jpg"] }
-            ],
-            gallery_albums: [
-                { title: "Amazing Nature", type: "photo", items: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/yiheyuan.jpeg", "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/me.jpeg"] },
-                { 
-                    title: "3D Atomic Objects", 
-                    type: "video", 
-                    items: [
-                        { 
-                            url: "https://www.youtube.com/watch?v=Fw7JEITqc58", 
-                            subtitle: "Poly-Si" 
-                        },
-                        { 
-                            url: "https://www.youtube.com/watch?v=3PXx0CkF7Fc", 
-                            subtitle: "Lunar Soil" 
-                        }
-                    ] 
-                }
-            ],
-            articles: [
-                { title: "Digital Sweatshops in the AI Era", source: "Lianhe Zaobao, Singapore", link: "https://www.zaobao.com.sg/forum/views/story20250919-7535380" },
-                { title: "The Gambler's Fallacy", source: "Sin Chew Daily, Malaysia", link: "https://www.sinchew.com.my/news/20210320/supplement/3144313" }
-            ],
-            social_links: [
-                { name: "ResearchGate", url: "https://www.researchgate.net/profile/Pua-Chenglin/" },
-                { name: "Google Scholar", url: "https://scholar.google.com/citations?user=OSv_Bm4AAAAJ&hl=en/" },
-                { name: "YouTube", url: "https://www.youtube.com/@AtomiMuseum/" },
-                { name: "BiliBili", url: "https://space.bilibili.com/3493105227533275/" },
-            ]
-        };
-
-        // --- CORE UI FUNCTIONS ---
-
-        /** Toggles the edit mode and updates the UI. */
-        function toggleEditMode(enable) {
-            isEditMode = enable;
-            const toggleButton = document.getElementById('edit-mode-toggle');
-            const editableElements = document.querySelectorAll('.content-editable-field');
-
-            if (isEditMode) {
-                toggleButton.textContent = 'Exit Edit Mode';
-                toggleButton.classList.remove('bg-white', 'text-gray-800');
-                toggleButton.classList.add('bg-red-500', 'text-white');
-                editableElements.forEach(el => {
-                    el.setAttribute('contenteditable', 'true');
-                    el.style.cursor = 'text';
-                });
-                // Show config button/options
-                const configButton = document.createElement('button');
-                configButton.id = 'config-btn';
-                configButton.innerHTML = '⚙️ Config';
-                configButton.className = 'px-4 py-2 text-sm font-medium rounded-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition duration-150 shadow-md ml-4';
-                configButton.onclick = () => document.getElementById('config-modal').classList.remove('hidden');
-                document.getElementById('edit-mode-toggle').parentElement.appendChild(configButton);
-
-            } else {
-                toggleButton.textContent = 'Enable Edit Mode';
-                toggleButton.classList.add('bg-white', 'text-gray-800');
-                toggleButton.classList.remove('bg-red-500', 'text-white');
-                editableElements.forEach(el => {
-                    el.removeAttribute('contenteditable');
-                    el.style.cursor = 'default';
-                });
-                const configBtn = document.getElementById('config-btn');
-                if (configBtn) configBtn.remove();
-                // Save content when exiting edit mode
-                saveContent();
-            }
-        }
-
-        /** Renders the entire website content based on the provided data. */
-        function renderContent(data) {
-            document.getElementById('loading-indicator').classList.add('hidden');
-            if (!data) data = initialContent; // Fallback to initial data if snapshot is empty
-
-            // --- 1. RESEARCH SECTION ---
-            document.getElementById('research-main-intro').textContent = data.research.main_intro || initialContent.research.main_intro;
-            document.getElementById('research-main-intro').dataset.key = 'research.main_intro';
-
-            const researchContainer = document.getElementById('research-sub-topics');
-            researchContainer.innerHTML = data.research.sub_topics.map((topic, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
-                    <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
-                        id="research-sub-topics-${i}-title" data-key="research.sub_topics[${i}].title" class="content-editable-field">
-                        ${topic.title}
-                    </h4>
-                    <p class="text-gray-600 content-editable-field min-h-[50px]"
-                        id="research-sub-topics-${i}-content" data-key="research.sub_topics[${i}].content">
-                        ${topic.content}
-                    </p>
-                </div>
-            `).join('');
-
-            // --- 2. EDUCATION SECTION ---
-            const educationContainer = document.getElementById('education-list');
-            educationContainer.innerHTML = (data.education || []).map((edu, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                    <div class="flex-grow">
-                        <p class="text-xl font-semibold" style="color: var(--theme-color-600, #4f46e5);"
-                           id="education-${i}-degree" data-key="education[${i}].degree" class="content-editable-field">
-                            ${edu.degree}
-                        </p>
-                        <p class="text-gray-600 text-lg mt-1"
-                           id="education-${i}-school" data-key="education[${i}].school" class="content-editable-field">
-                            ${edu.school}
-                        </p>
-                    </div>
-                    <p class="text-gray-500 text-base"
-                       id="education-${i}-years" data-key="education[${i}].years" class="content-editable-field">
-                        ${edu.years}
-                    </p>
-                </div>
-            `).join('');
-            
-            // --- 3. PRESENTATIONS SECTION ---
-            const presentationsContainer = document.getElementById('presentations-list');
-            presentationsContainer.innerHTML = (data.presentations || []).map((pres, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-start">
-                    <div class="flex-grow md:w-3/4 pr-4">
-                        <p class="text-lg font-semibold" style="color: var(--theme-color-600, #4f46e5);"
-                           id="presentation-${i}-title" data-key="presentations[${i}].title" class="content-editable-field">
-                            ${pres.title}
-                        </p>
-                        <p class="text-gray-600 text-base mt-1"
-                           id="presentation-${i}-venue" data-key="presentations[${i}].venue" class="content-editable-field">
-                            ${pres.venue}
-                        </p>
-                    </div>
-                    <p class="text-gray-500 text-base md:w-1/4 text-right"
-                       id="presentation-${i}-date" data-key="presentations[${i}].date" class="content-editable-field">
-                        ${pres.date}
-                    </p>
-                </div>
-            `).join('');
-
-            // --- 4. HONORS AND AWARDS SECTION ---
-            const honorsContainer = document.getElementById('honors-list');
-            honorsContainer.innerHTML = (data.honors_awards || []).map((award, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                    <p class="text-lg font-semibold text-gray-700"
-                       id="honors-${i}-title" data-key="honors_awards[${i}].title" class="content-editable-field">
-                        ${award.title}
-                    </p>
-                    <p class="text-gray-500 text-base"
-                       id="honors-${i}-year" data-key="honors_awards[${i}].year" class="content-editable-field">
-                        ${award.year}
-                    </p>
-                </div>
-            `).join('');
-
-
-            // --- 5. PERSONAL LIFE SECTION ---
-            const personalContainer = document.getElementById('personal-life-memories');
-            personalContainer.innerHTML = data.personal_life.map((memory, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-xl"> 
-                    <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
-                        id="personal-life-${i}-title" data-key="personal_life[${i}].title" class="content-editable-field">
-                        ${memory.title}
-                    </h4>
-                    <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
-                        id="personal-life-${i}-content" data-key="personal_life[${i}].content">
-                        ${memory.content}
-                    </p>
-            
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${(memory.images || []).map(item => { // We assume 'images' contains all media items (photos/videos)
-            
-                            // Helper to get URL and Subtitle, supporting the Gallery object format: { url: "...", subtitle: "..." }
-                            const url = typeof item === 'object' && item.url ? item.url : item;
-                            const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-            
-                            // Determine if the item is a video by checking the URL
-                            const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
-            
-                            if (isVideo) {
-                                // Video Rendering Logic (from Gallery)
-                                let embedUrl = url;
-                                if (url.includes('youtube.com/watch?v=')) {
-                                    embedUrl = url.replace('watch?v=', 'embed/');
-                                }
-                                return `
-                                    <div class="space-y-2"> 
-                                        <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                            <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                        </div>
-                                        ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
-                                    </div>
-                                `;
-                            } else {
-                                // Photo Rendering Logic (from Gallery)
-                                return `
-                                    <img src="${url}" alt="${memory.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
-                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                `;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            // --- 6. GALLERY SECTION (Albums) ---
-            const galleryContainer = document.getElementById('gallery-albums');
-            galleryContainer.innerHTML = data.gallery_albums.map((album, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-xl">
-                    <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);"
-                        id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title" class="content-editable-field">
-                        ${album.title}
-                    </h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${(album.items || []).map(item => { // 'item' is now a video object or a photo URL string
-                            
-                            // Helper to get URL and Subtitle, handling both new objects and old strings
-                            const url = typeof item === 'object' && item.url ? item.url : item;
-                            const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-            
-                            if (album.type === 'video') {
-                                // Assume videos are embed links (YouTube, BiliBili)
-                                let embedUrl = url;
-                                if (url.includes('youtube.com/watch?v=')) {
-                                    embedUrl = url.replace('watch?v=', 'embed/');
-                                }
-                                return `
-                                    <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                            <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                        </div>
-                                        ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
-                                    </div>
-                                `;
-                            } else {
-                                // Photos
-                                return `
-                                    <img src="${url}" alt="${album.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
-                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                `;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-
-            // --- 7. ARTICLE SECTION ---
-            const articleContainer = document.getElementById('article-list');
-            articleContainer.innerHTML = data.articles.map((article, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                    <div>
-                        <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);"
-                           id="article-${i}-title" data-key="articles[${i}].title" class="content-editable-field">
-                            ${article.title}
-                        </a>
-                        <p class="text-gray-500 text-sm mt-1"
-                           id="article-${i}-source" data-key="articles[${i}].source" class="content-editable-field">
-                            ${article.source}
-                        </p>
-                    </div>
-                </div>
-            `).join('');
-
-            // --- 8. SOCIAL LINKS (FOOTER) ---
-            const socialContainer = document.getElementById('social-links-container');
-            socialContainer.innerHTML = data.social_links.map((link, i) => `
-                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
-                   id="social-${i}-name" data-key="social_links[${i}].name" class="content-editable-field">
-                    ${link.name}
-                </a>
-                <span class="text-white hidden">
-                    URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
-                </span>
-            `).join('<span class="text-white">|</span>');
-
-            // Re-apply editable attributes after content is re-rendered
-            if (isEditMode) {
-                document.querySelectorAll('.content-editable-field').forEach(el => {
-                    el.setAttribute('contenteditable', 'true');
-                });
-            }
-        }
-
-        /** Saves the current state of all editable fields back to Firestore. */
-        async function saveContent() {
-            if (!db || !userId) return console.error("Database or User ID not initialized for saving.");
-
-            const updatedContent = JSON.parse(JSON.stringify(initialContent)); // Start with a fresh copy
-            const editableElements = document.querySelectorAll('.content-editable-field');
-
-            editableElements.forEach(el => {
-                const key = el.dataset.key;
-                if (!key) return;
-
-                const value = el.textContent.trim();
-
-                // Function to set nested property (handles array indices)
-                const setNestedProperty = (obj, path, val) => {
-                    const parts = path.match(/[^.\[\]]+/g);
-                    let current = obj;
-                    for (let i = 0; i < parts.length; i++) {
-                        const part = parts[i];
-                        if (i === parts.length - 1) {
-                            // Check if the property should be an array (for media URLs)
-                            if (path.includes('.images') || path.includes('.items')) {
-                                current[part] = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
-                            } else {
-                                current[part] = val;
-                            }
-                            return;
-                        }
-
-                        let nextPart = parts[i + 1];
-                        if (!current[part]) {
-                            // Determine if the next part is an index (i.e., start of an array)
-                            if (!isNaN(parseInt(nextPart))) {
-                                current[part] = [];
-                            } else {
-                                current[part] = {};
-                            }
-                        }
-                        current = current[part];
+        personal_life: [
+            { title: "Japan Kyoto", content: "It was my first time in Japan, and I was incredibly lucky to meet my idol, Jay Chou, while I was there!", images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/jay_chou.jpg","https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/tokyo_japan.jpg"] },
+            { title: "USA Silicon Valley", content: "Photos from my trip to Silicon Valley, USA, during November 2024.", images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/jay_chou.jpg"] }
+        ],
+        gallery_albums: [
+            { title: "Amazing Nature", type: "photo", items: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/yiheyuan.jpeg", "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/me.jpeg"] },
+            { 
+                title: "3D Atomic Objects", 
+                type: "video", 
+                items: [
+                    { 
+                        url: "https://www.youtube.com/watch?v=Fw7JEITqc58", 
+                        subtitle: "Poly-Si" 
+                    },
+                    { 
+                        url: "https://www.youtube.com/watch?v=3PXx0CkF7Fc", 
+                        subtitle: "Lunar Soil" 
                     }
-                };
+                ] 
+            }
+        ],
+        articles: [
+            { title: "Digital Sweatshops in the AI Era", source: "Lianhe Zaobao, Singapore", link: "https://www.zaobao.com.sg/forum/views/story20250919-7535380" },
+            { title: "The Gambler's Fallacy", source: "Sin Chew Daily, Malaysia", link: "https://www.sinchew.com.my/news/20210320/supplement/3144313" }
+        ],
+        social_links: [
+            { name: "ResearchGate", url: "https://www.researchgate.net/profile/Pua-Chenglin/" },
+            { name: "Google Scholar", url: "https://scholar.google.com/citations?user=OSv_Bm4AAAAJ&hl=en/" },
+            { name: "YouTube", url: "https://www.youtube.com/@AtomiMuseum/" },
+            { name: "BiliBili", url: "https://space.bilibili.com/3493105227533275/" },
+        ]
+    };
 
-                setNestedProperty(updatedContent, key, value);
+    // --- CORE UI FUNCTIONS ---
+
+    /** Toggles the edit mode and updates the UI. */
+    function toggleEditMode(enable) {
+        isEditMode = enable;
+        const toggleButton = document.getElementById('edit-mode-toggle');
+        const editableElements = document.querySelectorAll('.content-editable-field');
+
+        if (isEditMode) {
+            toggleButton.textContent = 'Exit Edit Mode';
+            toggleButton.classList.remove('bg-white', 'text-gray-800');
+            toggleButton.classList.add('bg-red-500', 'text-white');
+            editableElements.forEach(el => {
+                el.setAttribute('contenteditable', 'true');
+                el.style.cursor = 'text';
             });
+            // Show config button/options
+            const configButton = document.createElement('button');
+            configButton.id = 'config-btn';
+            configButton.innerHTML = '⚙️ Config';
+            configButton.className = 'px-4 py-2 text-sm font-medium rounded-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition duration-150 shadow-md ml-4';
+            configButton.onclick = () => document.getElementById('config-modal').classList.remove('hidden');
+            document.getElementById('edit-mode-toggle').parentElement.appendChild(configButton);
 
+        } else {
+            toggleButton.textContent = 'Enable Edit Mode';
+            toggleButton.classList.add('bg-white', 'text-gray-800');
+            toggleButton.classList.remove('bg-red-500', 'text-white');
+            editableElements.forEach(el => {
+                el.removeAttribute('contenteditable');
+                el.style.cursor = 'default';
+            });
+            const configBtn = document.getElementById('config-btn');
+            if (configBtn) configBtn.remove();
+            // Save content when exiting edit mode
+            saveContent();
+        }
+    }
+
+    /** Renders the entire website content based on the provided data. */
+    function renderContent(data) {
+        document.getElementById('loading-indicator').classList.add('hidden');
+        if (!data) data = initialContent; // Fallback to initial data if snapshot is empty
+
+        // --- 1. RESEARCH SECTION ---
+        document.getElementById('research-main-intro').textContent = data.research.main_intro || initialContent.research.main_intro;
+        document.getElementById('research-main-intro').dataset.key = 'research.main_intro';
+
+        const researchContainer = document.getElementById('research-sub-topics');
+        researchContainer.innerHTML = data.research.sub_topics.map((topic, i) => `
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
+                ${topic.image_url ? `
+                    <div class="w-full aspect-square overflow-hidden mb-4 rounded-lg shadow-lg">
+                        <img src="${topic.image_url}" alt="${topic.title} graphic" class="w-full h-full object-cover">
+                    </div>
+                ` : ''}
+                <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
+                    id="research-sub-topics-${i}-title" data-key="research.sub_topics[${i}].title" class="content-editable-field">
+                    ${topic.title}
+                </h4>
+                <p class="text-gray-600 content-editable-field min-h-[50px]"
+                    id="research-sub-topics-${i}-content" data-key="research.sub_topics[${i}].content">
+                    ${topic.content}
+                </p>
+            </div>
+        `).join('');
+
+        // --- 2. EDUCATION SECTION ---
+        const educationContainer = document.getElementById('education-list');
+        educationContainer.innerHTML = (data.education || []).map((edu, i) => `
+            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                <div class="flex-grow">
+                    <p class="text-xl font-semibold" style="color: var(--theme-color-600, #4f46e5);"
+                       id="education-${i}-degree" data-key="education[${i}].degree" class="content-editable-field">
+                        ${edu.degree}
+                    </p>
+                    <p class="text-gray-600 text-lg mt-1"
+                       id="education-${i}-school" data-key="education[${i}].school" class="content-editable-field">
+                        ${edu.school}
+                    </p>
+                </div>
+                <p class="text-gray-500 text-base"
+                   id="education-${i}-years" data-key="education[${i}].years" class="content-editable-field">
+                    ${edu.years}
+                </p>
+            </div>
+        `).join('');
+        
+        // --- 3. PRESENTATIONS SECTION ---
+        const presentationsContainer = document.getElementById('presentations-list');
+        presentationsContainer.innerHTML = (data.presentations || []).map((pres, i) => `
+            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-start">
+                <div class="flex-grow md:w-3/4 pr-4">
+                    <p class="text-lg font-semibold" style="color: var(--theme-color-600, #4f46e5);"
+                       id="presentation-${i}-title" data-key="presentations[${i}].title" class="content-editable-field">
+                        ${pres.title}
+                    </p>
+                    <p class="text-gray-600 text-base mt-1"
+                       id="presentation-${i}-venue" data-key="presentations[${i}].venue" class="content-editable-field">
+                        ${pres.venue}
+                    </p>
+                </div>
+                <p class="text-gray-500 text-base md:w-1/4 text-right"
+                   id="presentation-${i}-date" data-key="presentations[${i}].date" class="content-editable-field">
+                    ${pres.date}
+                </p>
+            </div>
+        `).join('');
+
+        // --- 4. HONORS AND AWARDS SECTION ---
+        const honorsContainer = document.getElementById('honors-list');
+        honorsContainer.innerHTML = (data.honors_awards || []).map((award, i) => `
+            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                <p class="text-lg font-semibold text-gray-700"
+                   id="honors-${i}-title" data-key="honors_awards[${i}].title" class="content-editable-field">
+                    ${award.title}
+                </p>
+                <p class="text-gray-500 text-base"
+                   id="honors-${i}-year" data-key="honors_awards[${i}].year" class="content-editable-field">
+                    ${award.year}
+                </p>
+            </div>
+        `).join('');
+
+
+        // --- 5. PERSONAL LIFE SECTION ---
+        const personalContainer = document.getElementById('personal-life-memories');
+        personalContainer.innerHTML = data.personal_life.map((memory, i) => `
+            <div class="bg-white p-6 rounded-xl shadow-xl"> 
+                <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
+                    id="personal-life-${i}-title" data-key="personal_life[${i}].title" class="content-editable-field">
+                    ${memory.title}
+                </h4>
+                <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
+                    id="personal-life-${i}-content" data-key="personal_life[${i}].content">
+                    ${memory.content}
+                </p>
+        
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    ${(memory.images || []).map(item => { // We assume 'images' contains all media items (photos/videos)
+        
+                        // Helper to get URL and Subtitle, supporting the Gallery object format: { url: "...", subtitle: "..." }
+                        const url = typeof item === 'object' && item.url ? item.url : item;
+                        const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+        
+                        // Determine if the item is a video by checking the URL
+                        const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
+        
+                        if (isVideo) {
+                            // Video Rendering Logic (from Gallery)
+                            let embedUrl = url;
+                            if (url.includes('youtube.com/watch?v=')) {
+                                embedUrl = url.replace('watch?v=', 'embed/');
+                            }
+                            return `
+                                <div class="space-y-2"> 
+                                    <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                        <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
+                                </div>
+                            `;
+                        } else {
+                            // Photo Rendering Logic (from Gallery)
+                            return `
+                                <img src="${url}" alt="${memory.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                            `;
+                        }
+                    }).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        // --- 6. GALLERY SECTION (Albums) ---
+        const galleryContainer = document.getElementById('gallery-albums');
+        galleryContainer.innerHTML = data.gallery_albums.map((album, i) => `
+            <div class="bg-white p-6 rounded-xl shadow-xl">
+                <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);"
+                    id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title" class="content-editable-field">
+                    ${album.title}
+                </h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    ${(album.items || []).map(item => { // 'item' is now a video object or a photo URL string
+                        
+                        // Helper to get URL and Subtitle, handling both new objects and old strings
+                        const url = typeof item === 'object' && item.url ? item.url : item;
+                        const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+        
+                        if (album.type === 'video') {
+                            // Assume videos are embed links (YouTube, BiliBili)
+                            let embedUrl = url;
+                            if (url.includes('youtube.com/watch?v=')) {
+                                embedUrl = url.replace('watch?v=', 'embed/');
+                            }
+                            return `
+                                <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                        <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                    ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
+                                </div>
+                            `;
+                        } else {
+                            // Photos
+                            return `
+                                <img src="${url}" alt="${album.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                            `;
+                        }
+                    }).join('')}
+                </div>
+            </div>
+        `).join('');
+
+
+        // --- 7. ARTICLE SECTION ---
+        const articleContainer = document.getElementById('article-list');
+        articleContainer.innerHTML = data.articles.map((article, i) => `
+            <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                <div>
+                    <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);"
+                       id="article-${i}-title" data-key="articles[${i}].title" class="content-editable-field">
+                        ${article.title}
+                    </a>
+                    <p class="text-gray-500 text-sm mt-1"
+                       id="article-${i}-source" data-key="articles[${i}].source" class="content-editable-field">
+                        ${article.source}
+                    </p>
+                </div>
+            </div>
+        `).join('');
+
+        // --- 8. SOCIAL LINKS (FOOTER) ---
+        const socialContainer = document.getElementById('social-links-container');
+        socialContainer.innerHTML = data.social_links.map((link, i) => `
+            <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
+               id="social-${i}-name" data-key="social_links[${i}].name" class="content-editable-field">
+                ${link.name}
+            </a>
+            <span class="text-white hidden">
+                URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
+            </span>
+        `).join('<span class="text-white">|</span>');
+
+        // Re-apply editable attributes after content is re-rendered
+        if (isEditMode) {
+            document.querySelectorAll('.content-editable-field').forEach(el => {
+                el.setAttribute('contenteditable', 'true');
+            });
+        }
+    }
+
+    /** Saves the current state of all editable fields back to Firestore. */
+    async function saveContent() {
+        if (!db || !userId) return console.error("Database or User ID not initialized for saving.");
+
+        const updatedContent = JSON.parse(JSON.stringify(initialContent)); // Start with a fresh copy
+        const editableElements = document.querySelectorAll('.content-editable-field');
+
+        editableElements.forEach(el => {
+            const key = el.dataset.key;
+            if (!key) return;
+
+            const value = el.textContent.trim();
+
+            // Function to set nested property (handles array indices)
+            const setNestedProperty = (obj, path, val) => {
+                const parts = path.match(/[^.\[\]]+/g);
+                let current = obj;
+                for (let i = 0; i < parts.length; i++) {
+                    const part = parts[i];
+                    if (i === parts.length - 1) {
+                        // Check if the property should be an array (for media URLs)
+                        if (path.includes('.images') || path.includes('.items')) {
+                            current[part] = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                        } else {
+                            current[part] = val;
+                        }
+                        return;
+                    }
+
+                    let nextPart = parts[i + 1];
+                    if (!current[part]) {
+                        // Determine if the next part is an index (i.e., start of an array)
+                        if (!isNaN(parseInt(nextPart))) {
+                            current[part] = [];
+                        } else {
+                            current[part] = {};
+                        }
+                    }
+                    current = current[part];
+                }
+            };
+
+            setNestedProperty(updatedContent, key, value);
+        });
+
+        try {
+            // Save the full public content document
+            await setDoc(doc(db, CONTENT_PATH), updatedContent);
+            console.log("Website content saved successfully!");
+        } catch (error) {
+            console.error("Error saving content to Firestore:", error);
+            // Note: Using a custom modal/toast message is preferred over standard alert()
+            console.warn("Failed to save content. Check the console for details.");
+        }
+    }
+
+    // --- THEME COLOR FUNCTIONS ---
+
+    function applyThemeColor(hexColor) {
+        themeColorHex = hexColor;
+        const style = document.documentElement.style;
+        // A simplified way to set color variables based on the chosen hex
+        style.setProperty('--theme-color-500', hexColor);
+        style.setProperty('--theme-color-600', hexColor);
+        style.setProperty('--theme-color-700', hexColor);
+        style.setProperty('--theme-color-800', hexColor);
+
+        // Set the color picker value
+        document.getElementById('color-picker').value = hexColor;
+    }
+
+    async function saveThemeColor() {
+        const newColor = document.getElementById('color-picker').value;
+        applyThemeColor(newColor);
+        document.getElementById('config-modal').classList.add('hidden');
+
+        if (db && userId) {
             try {
-                // Save the full public content document
-                await setDoc(doc(db, CONTENT_PATH), updatedContent);
-                console.log("Website content saved successfully!");
+                await setDoc(doc(db, CONFIG_PATH(userId)), { themeColor: newColor }, { merge: true });
+                console.log("Theme color saved successfully!");
             } catch (error) {
-                console.error("Error saving content to Firestore:", error);
-                // Note: Using a custom modal/toast message is preferred over standard alert()
-                console.warn("Failed to save content. Check the console for details.");
+                console.error("Error saving theme color:", error);
             }
         }
+    }
 
-        // --- THEME COLOR FUNCTIONS ---
+    // --- INITIALIZATION & AUTHENTICATION ---
 
-        function applyThemeColor(hexColor) {
-            themeColorHex = hexColor;
-            const style = document.documentElement.style;
-            // A simplified way to set color variables based on the chosen hex
-            style.setProperty('--theme-color-500', hexColor);
-            style.setProperty('--theme-color-600', hexColor);
-            style.setProperty('--theme-color-700', hexColor);
-            style.setProperty('--theme-color-800', hexColor);
-
-            // Set the color picker value
-            document.getElementById('color-picker').value = hexColor;
-        }
-
-        async function saveThemeColor() {
-            const newColor = document.getElementById('color-picker').value;
-            applyThemeColor(newColor);
-            document.getElementById('config-modal').classList.add('hidden');
-
-            if (db && userId) {
-                try {
-                    await setDoc(doc(db, CONFIG_PATH(userId)), { themeColor: newColor }, { merge: true });
-                    console.log("Theme color saved successfully!");
-                } catch (error) {
-                    console.error("Error saving theme color:", error);
-                }
+    async function initializeFirebase() {
+        try {
+            if (Object.keys(firebaseConfig).length === 0) {
+                throw new Error("Firebase configuration is missing or empty.");
             }
-        }
 
-        // --- INITIALIZATION & AUTHENTICATION ---
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
 
-        async function initializeFirebase() {
-            try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    throw new Error("Firebase configuration is missing or empty.");
-                }
+            // 1. Authentication
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
 
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+            onAuthStateChanged(auth, (user) => {
+                userId = user ? user.uid : null;
+                isAuthReady = true;
+                document.getElementById('user-id-display').textContent = userId || 'N/A';
+                console.log("Auth State Changed. User ID:", userId);
 
-                // 1. Authentication
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // 2. Load Content (Public)
+                onSnapshot(doc(db, CONTENT_PATH), (docSnap) => {
+                    const content = docSnap.exists() ? docSnap.data() : initialContent;
+                    renderContent(content);
+                    // Write initial content if the document doesn't exist
+                    if (!docSnap.exists()) {
+                        setDoc(doc(db, CONTENT_PATH), initialContent).catch(e => console.error("Error writing initial content:", e));
+                    }
+                }, (error) => {
+                    console.error("Error listening to public content:", error);
+                    // Render fallback content on error
+                    renderContent(initialContent);
+                });
 
-                onAuthStateChanged(auth, (user) => {
-                    userId = user ? user.uid : null;
-                    isAuthReady = true;
-                    document.getElementById('user-id-display').textContent = userId || 'N/A';
-                    console.log("Auth State Changed. User ID:", userId);
-
-                    // 2. Load Content (Public)
-                    onSnapshot(doc(db, CONTENT_PATH), (docSnap) => {
-                        const content = docSnap.exists() ? docSnap.data() : initialContent;
-                        renderContent(content);
-                        // Write initial content if the document doesn't exist
-                        if (!docSnap.exists()) {
-                            setDoc(doc(db, CONTENT_PATH), initialContent).catch(e => console.error("Error writing initial content:", e));
+                // 3. Load Settings (Private)
+                if (userId) {
+                    onSnapshot(doc(db, CONFIG_PATH(userId)), (docSnap) => {
+                        if (docSnap.exists() && docSnap.data().themeColor) {
+                            applyThemeColor(docSnap.data().themeColor);
+                        } else {
+                            applyThemeColor(themeColorHex); // Apply default
                         }
                     }, (error) => {
-                        console.error("Error listening to public content:", error);
-                        // Render fallback content on error
-                        renderContent(initialContent);
+                        console.warn("Could not load private settings, using default theme.", error);
+                        applyThemeColor(themeColorHex); // Apply default on error
                     });
+                }
+            });
 
-                    // 3. Load Settings (Private)
-                    if (userId) {
-                        onSnapshot(doc(db, CONFIG_PATH(userId)), (docSnap) => {
-                            if (docSnap.exists() && docSnap.data().themeColor) {
-                                applyThemeColor(docSnap.data().themeColor);
-                            } else {
-                                applyThemeColor(themeColorHex); // Apply default
-                            }
-                        }, (error) => {
-                            console.warn("Could not load private settings, using default theme.", error);
-                            applyThemeColor(themeColorHex); // Apply default on error
-                        });
-                    }
-                });
+            document.getElementById('edit-mode-toggle').addEventListener('click', () => {
+                // Only the authenticated user can use edit mode (since their settings doc is tied to their auth token)
+                if (userId) {
+                    toggleEditMode(!isEditMode);
+                } else {
+                    // Using console.warn instead of alert() per guidelines
+                    console.warn("Cannot enable Edit Mode. Authentication failed or user is not recognized as the owner.");
+                    // Optional: show a simple on-screen modal instead of alert
+                }
+            });
 
-                document.getElementById('edit-mode-toggle').addEventListener('click', () => {
-                    // Only the authenticated user can use edit mode (since their settings doc is tied to their auth token)
-                    if (userId) {
-                        toggleEditMode(!isEditMode);
-                    } else {
-                        // Using console.warn instead of alert() per guidelines
-                        console.warn("Cannot enable Edit Mode. Authentication failed or user is not recognized as the owner.");
-                        // Optional: show a simple on-screen modal instead of alert
-                    }
-                });
-
-            } catch (error) {
-                document.getElementById('loading-indicator').innerHTML = `
-                    <p class="text-red-600 text-lg">Error Initializing Firebase:</p>
-                    <p class="text-red-500 text-sm mt-2">The application could not load its content database. Please check console for details.</p>
-                `;
-                console.error("Firebase initialization failed:", error);
-                renderContent(initialContent); // Render initial dummy content
-            }
+        } catch (error) {
+            document.getElementById('loading-indicator').innerHTML = `
+                <p class="text-red-600 text-lg">Error Initializing Firebase:</p>
+                <p class="text-red-500 text-sm mt-2">The application could not load its content database. Please check console for details.</p>
+            `;
+            console.error("Firebase initialization failed:", error);
+            renderContent(initialContent); // Render initial dummy content
         }
+    }
 
-        // Initialize the app on page load
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-        initializeFirebase();
+    // Initialize the app on page load
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    initializeFirebase();
 
-        // Make saveThemeColor globally available for the button click in the modal
-        window.saveThemeColor = saveThemeColor;
+    // Make saveThemeColor globally available for the button click in the modal
+    window.saveThemeColor = saveThemeColor;
 
-        // Add event listener to save content when the browser is closed or refreshed while in edit mode
-        window.addEventListener('beforeunload', () => {
-            if (isEditMode) {
-                // Note: saveContent is an async function, but beforeunload does not wait for promises.
-                // We trust the Firestore SDK to handle the pending write operation.
-                saveContent();
-            }
-        });
-    </script>
-</body>
-</html>
+    // Add event listener to save content when the browser is closed or refreshed while in edit mode
+    window.addEventListener('beforeunload', () => {
+        if (isEditMode) {
+            // Note: saveContent is an async function, but beforeunload does not wait for promises.
+            // We trust the Firestore SDK to handle the pending write operation.
+            saveContent();
+        }
+    });
+</script>
