@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chenglin Pua</title>
+    <title>Chenglin Pua - Home</title>
     <meta name="description" content="Chenglin Pua personal website and research portfolio covering imaging alien samples, light element studies, personal life, and published articles.">
     <meta name="keywords" content="research, science, electron ptychography, microscopy, personal, portfolio, articles, gallery, education, presentations, awards">
     <meta name="author" content="Chenglin Pua">
@@ -27,7 +27,7 @@
             outline: 2px solid var(--theme-color-500, #3b82f6);
             cursor: text;
         }
-        /* Utility class for preview content truncation - REMOVED FOR RESEARCH INTRO */
+        /* Utility class for preview content truncation */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -41,7 +41,7 @@
             overflow: hidden;
         }
 
-        /* NEW: Magnification on Hover */
+        /* Magnification on Hover */
         .magnify-on-hover {
             transition: transform 0.3s ease-in-out, box-shadow 0.3s;
         }
@@ -59,10 +59,10 @@
             <h1 class="text-3xl font-extrabold tracking-tight text-white">Chenglin Pua</h1>
             <nav class="hidden md:flex space-x-6">
                 <a href="./" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Home</a>
-                <a href="?page=research" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
-                <a href="?page=personal" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
-                <a href="?page=gallery" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
-                <a href="?page=articles" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
+                <a href="research/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
+                <a href="personal/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
+                <a href="gallery/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
+                <a href="articles/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
             </nav>
         </div>
     </header>
@@ -135,7 +135,6 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Set Firestore log level for debugging
         setLogLevel('debug');
 
         // --- GLOBAL VARIABLES & INITIALIZATION ---
@@ -144,16 +143,13 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth, userId = null;
-        let isAuthReady = false;
         let isEditMode = false;
         let themeColorHex = '#3B82F6'; // Default Tailwind Indigo 500
 
         const CONFIG_PATH = (uid) => `artifacts/${appId}/users/${uid}/website_settings/settings`;
         const CONTENT_PATH = `artifacts/${appId}/public/data/website_content/main_data`;
 
-        // --- DATA STRUCTURE & INITIAL DATA ---
         const initialContent = {
-            // NEW PROFILE OBJECT FOR EDITABLE PROFILE INFO
             profile: {
                 name: "Chenglin Pua",
                 title: "PhD Candidate in Material Science at Tsinghua"
@@ -214,9 +210,10 @@
 
         const PREVIEW_COUNT = 2; // Number of items to show in the preview sections
 
-        // --- CORE UI FUNCTIONS ---
+        // ====================================================================
+        // SHARED UI FUNCTIONS (Used by ALL Pages)
+        // ====================================================================
 
-        /** Toggles the edit mode and updates the UI. */
         function toggleEditMode(enable) {
             isEditMode = enable;
             const toggleButton = document.getElementById('edit-mode-toggle');
@@ -248,36 +245,13 @@
                 });
                 const configBtn = document.getElementById('config-btn');
                 if (configBtn) configBtn.remove();
-                // Save content when exiting edit mode
                 saveContent();
             }
         }
         
-        // --- ROUTING HELPERS ---
-        
-        function getPageFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('page'); // 'research', 'personal', 'gallery', 'articles' or null
-        }
-
-        function getRouterTitle(page) {
-            switch(page) {
-                case 'research': return '🔬 Research Overview (Full Academic Portfolio)';
-                case 'personal': return '✈️ Personal Life & Travels (Full Album)';
-                case 'gallery': return '🖼️ Gallery & Media (Albums) (Full)';
-                case 'articles': return '📰 Articles & Published Thoughts (Full List)';
-                default: return '';
-            }
-        }
-
-        // --- RENDER FUNCTIONS (HELPER) ---
-
-        /** Renders the persistent profile sidebar. */
         function renderProfileSidebar(data) {
             const profileContainer = document.getElementById('profile-sidebar-content');
-            // Hardcoded placeholder image URL for user's picture (can be made editable later if needed)
             const profileImageUrl = "https://placehold.co/150x150/1D4ED8/FFFFFF?text=CP"; 
-
             const profileName = data.profile?.name || initialContent.profile.name;
             const profileTitle = data.profile?.title || initialContent.profile.title;
 
@@ -296,7 +270,6 @@
 
                     <div class="space-y-3 pt-4 border-t border-gray-100">
                         ${data.social_links.map(link => {
-                            // Only show the four requested links in the sidebar
                             if (['Google Scholar', 'ResearchGate', 'YouTube', 'BiliBili'].includes(link.name)) {
                                 return `
                                     <a href="${link.url}" target="_blank" class="flex items-center justify-center text-sm font-medium text-gray-700 hover:text-gray-900 transition duration-150">
@@ -311,13 +284,101 @@
             `;
         }
 
-        // --- RENDER FUNCTIONS (FULL CONTENT) ---
-        // Renamed academic sections from render...Full to render... for reuse on the main page.
+        function renderSocialLinks(data) {
+            const socialContainer = document.getElementById('social-links-container');
+            socialContainer.innerHTML = data.social_links.map((link, i) => `
+                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
+                   id="social-${i}-name" data-key="social_links[${i}].name">
+                    ${link.name}
+                </a>
+                <span class="text-white hidden">
+                    URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
+                </span>
+            `).join('<span class="text-white">|</span>');
+        }
+
+        async function saveContent() {
+            if (!db || !userId) return console.error("Database or User ID not initialized for saving.");
+
+            const updatedContent = JSON.parse(JSON.stringify(initialContent));
+            const editableElements = document.querySelectorAll('.content-editable-field');
+
+            editableElements.forEach(el => {
+                const key = el.dataset.key;
+                if (!key) return;
+
+                const value = el.textContent.trim();
+
+                const setNestedProperty = (obj, path, val) => {
+                    const parts = path.match(/[^.\[\]]+/g);
+                    let current = obj;
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (i === parts.length - 1) {
+                            if (path.includes('.images') || path.includes('.items')) {
+                                current[part] = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                            } else {
+                                current[part] = val;
+                            }
+                            return;
+                        }
+
+                        let nextPart = parts[i + 1];
+                        if (!current[part]) {
+                            if (!isNaN(parseInt(nextPart))) {
+                                current[part] = [];
+                            } else {
+                                current[part] = {};
+                            }
+                        }
+                        current = current[part];
+                    }
+                };
+                setNestedProperty(updatedContent, key, value);
+            });
+
+            try {
+                await setDoc(doc(db, CONTENT_PATH), updatedContent);
+                console.log("Website content saved successfully!");
+            } catch (error) {
+                console.error("Error saving content to Firestore:", error);
+                console.warn("Failed to save content. Check the console for details.");
+            }
+        }
+
+        function applyThemeColor(hexColor) {
+            themeColorHex = hexColor;
+            const style = document.documentElement.style;
+            style.setProperty('--theme-color-500', hexColor);
+            style.setProperty('--theme-color-600', hexColor);
+            style.setProperty('--theme-color-700', hexColor);
+            style.setProperty('--theme-color-800', hexColor);
+            document.getElementById('color-picker').value = hexColor;
+        }
+
+        async function saveThemeColor() {
+            const newColor = document.getElementById('color-picker').value;
+            applyThemeColor(newColor);
+            document.getElementById('config-modal').classList.add('hidden');
+
+            if (db && userId) {
+                try {
+                    await setDoc(doc(db, CONFIG_PATH(userId)), { themeColor: newColor }, { merge: true });
+                    console.log("Theme color saved successfully!");
+                } catch (error) {
+                    console.error("Error saving theme color:", error);
+                }
+            }
+        }
         
+        // ====================================================================
+        // FULL CONTENT RENDER FUNCTIONS (Used by Sub-Pages)
+        // ====================================================================
+
         function renderResearchFull(data) {
             const researchSection = document.getElementById('research-section');
             researchSection.innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('research')}</h2>
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview (Full Academic Portfolio)</h2>
 
                 <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
                     <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
@@ -355,6 +416,277 @@
             `;
         }
 
+        function renderPersonalFull(data) {
+            const personalSection = document.getElementById('personal-section');
+            personalSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels (Full Album)</h2>
+                <div class="space-y-10" id="personal-life-memories">
+                    ${data.personal_life.map((memory, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
+                            <h4 class="text-2xl font-semibold mb-3 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="personal-life-${i}-title" data-key="personal_life[${i}].title">
+                                ${memory.title}
+                            </h4>
+                            <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
+                                id="personal-life-${i}-content" data-key="personal_life[${i}].content">
+                                ${memory.content}
+                            </p>
+                    
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(memory.images || []).map(item => { 
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+                                    const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
+                    
+                                    if (isVideo) {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2"> 
+                                                <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                </div>
+                                                ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300"
+                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                            <p class="mt-4 text-sm text-gray-500">
+                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="personal_life[${i}].images">${(memory.images || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderGalleryFull(data) {
+            const gallerySection = document.getElementById('gallery-section');
+            gallerySection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums) (Full)</h2>
+                <div class="space-y-10" id="gallery-albums">
+                    ${data.gallery_albums.map((album, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl">
+                            <h4 class="text-2xl font-semibold mb-4 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title">
+                                ${album.title}
+                            </h4>
+                            <p class="text-sm text-gray-500 mb-4">Album Type: <span class="content-editable-field" data-key="gallery_albums[${i}].type">${album.type}</span></p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(album.items || []).map((item, j) => { 
+                                    
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+                    
+                                    if (album.type === 'video') {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                </div>
+                                                ${subtitle ? `<p class="text-sm text-center text-gray-500 content-editable-field" data-key="gallery_albums[${i}].items[${j}].subtitle">${subtitle}</p>` : ''}
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <img src="${url}" alt="${album.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300"
+                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                            <p class="mt-4 text-sm text-gray-500">
+                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="gallery_albums[${i}].items">${(album.items || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderArticlesFull(data) {
+            const articleSection = document.getElementById('articles-section');
+            articleSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts (Full List)</h2>
+                <div class="space-y-4" id="article-list">
+                    ${data.articles.map((article, i) => `
+                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                            <div>
+                                <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                   id="article-${i}-title" data-key="articles[${i}].title">
+                                    ${article.title}
+                                </a>
+                                <p class="text-gray-500 text-sm mt-1 content-editable-field"
+                                   id="article-${i}-source" data-key="articles[${i}].source">
+                                    ${article.source}
+                                </p>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    Link: <span class="content-editable-field break-all" data-key="articles[${i}].link">${article.link}</span>
+                                </p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+
+        // ====================================================================
+        // PREVIEW RENDER FUNCTIONS (Used ONLY by Home Page)
+        // ====================================================================
+
+        function renderResearchPreview(data) {
+            document.getElementById('research-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview</h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
+                    <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
+                    <p class="text-gray-600 leading-relaxed min-h-[50px]">
+                        ${data.research.main_intro || initialContent.research.main_intro}
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8" id="research-sub-topics-preview">
+                    ${data.research.sub_topics.slice(0, PREVIEW_COUNT).map((topic, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
+                            ${topic.image_url ? `
+                                <div class="mb-4">
+                                    <img src="${topic.image_url}" alt="${topic.title} illustration" 
+                                        class="w-full h-auto object-contain rounded-lg shadow-md magnify-on-hover" />
+                                </div>
+                            ` : ''}
+                            <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
+                                ${topic.title}
+                            </h4>
+                            <p class="text-gray-600 min-h-[50px] line-clamp-3">
+                                ${topic.content}
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="research/" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        See More Research & Academic Details &rarr;
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderPersonalPreview(data) {
+            document.getElementById('personal-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
+
+                <div class="space-y-10" id="personal-life-memories-preview">
+                    ${data.personal_life.slice(0, PREVIEW_COUNT).map((memory, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
+                            <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
+                                ${memory.title}
+                            </h4>
+                            <p class="text-gray-600 leading-relaxed line-clamp-2 mb-4">
+                                ${memory.content}
+                            </p>
+                    
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(memory.images || []).slice(0, 4).map(item => {
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    return `<img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="personal/" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        See All Personal Memories &rarr;
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderGalleryPreview(data) {
+            // Filter to show only the two requested albums
+            const albumsToShow = data.gallery_albums.filter(album => 
+                album.title === "Amazing Nature" || album.title === "3D Atomic Objects"
+            );
+
+            document.getElementById('gallery-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums)</h2>
+
+                <div class="space-y-10" id="gallery-albums-preview">
+                    ${albumsToShow.map((album, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl">
+                            <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">
+                                ${album.title}
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(album.items || []).slice(0, 4).map(item => {
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const isVideo = album.type === 'video';
+                                    if (isVideo) {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2 aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <img src="${url}" alt="${album.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="gallery/" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        View All Albums & Media &rarr;
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderArticlesPreview(data) {
+            document.getElementById('articles-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts</h2>
+
+                <div class="space-y-4" id="article-list-preview">
+                    ${data.articles.slice(0, PREVIEW_COUNT).map((article, i) => `
+                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                            <div>
+                                <a href="articles/" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);">
+                                    ${article.title}
+                                </a>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    ${article.source}
+                                </p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="articles/" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        Read All Articles & Thoughts &rarr;
+                    </a>
+                </div>
+            `;
+        }
+        
         function renderEducation(data) {
             const educationSection = document.getElementById('education-section');
             educationSection.innerHTML = `
@@ -430,363 +762,27 @@
             `;
         }
 
+        // ====================================================================
+        // HOME PAGE INITIALIZATION (ONLY FOR index.html)
+        // ====================================================================
 
-        function renderPersonalFull(data) {
-            const personalSection = document.getElementById('personal-section');
-            personalSection.innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('personal')}</h2>
-                <div class="space-y-10" id="personal-life-memories">
-                    ${data.personal_life.map((memory, i) => `
-                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
-                            <h4 class="text-2xl font-semibold mb-3 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
-                                id="personal-life-${i}-title" data-key="personal_life[${i}].title">
-                                ${memory.title}
-                            </h4>
-                            <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
-                                id="personal-life-${i}-content" data-key="personal_life[${i}].content">
-                                ${memory.content}
-                            </p>
-                    
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                                ${(memory.images || []).map(item => { 
-                                    const url = typeof item === 'object' && item.url ? item.url : item;
-                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-                                    const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
-                    
-                                    if (isVideo) {
-                                        let embedUrl = url;
-                                        if (url.includes('youtube.com/watch?v=')) {
-                                            embedUrl = url.replace('watch?v=', 'embed/');
-                                        }
-                                        return `
-                                            <div class="space-y-2"> 
-                                                <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                                </div>
-                                                ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
-                                            </div>
-                                        `;
-                                    } else {
-                                        return `
-                                            <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300"
-                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                        `;
-                                    }
-                                }).join('')}
-                            </div>
-                            <p class="mt-4 text-sm text-gray-500">
-                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="personal_life[${i}].images">${(memory.images || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
-                            </p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-
-        function renderGalleryFull(data) {
-            const gallerySection = document.getElementById('gallery-section');
-            gallerySection.innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('gallery')}</h2>
-                <div class="space-y-10" id="gallery-albums">
-                    ${data.gallery_albums.map((album, i) => `
-                        <div class="bg-white p-6 rounded-xl shadow-xl">
-                            <h4 class="text-2xl font-semibold mb-4 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
-                                id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title">
-                                ${album.title}
-                            </h4>
-                            <p class="text-sm text-gray-500 mb-4">Album Type: <span class="content-editable-field" data-key="gallery_albums[${i}].type">${album.type}</span></p>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                                ${(album.items || []).map((item, j) => { 
-                                    
-                                    const url = typeof item === 'object' && item.url ? item.url : item;
-                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-                    
-                                    if (album.type === 'video') {
-                                        let embedUrl = url;
-                                        if (url.includes('youtube.com/watch?v=')) {
-                                            embedUrl = url.replace('watch?v=', 'embed/');
-                                        }
-                                        return `
-                                            <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                                </div>
-                                                ${subtitle ? `<p class="text-sm text-center text-gray-500 content-editable-field" data-key="gallery_albums[${i}].items[${j}].subtitle">${subtitle}</p>` : ''}
-                                            </div>
-                                        `;
-                                    } else {
-                                        // Photos
-                                        return `
-                                            <img src="${url}" alt="${album.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300"
-                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                        `;
-                                    }
-                                }).join('')}
-                            </div>
-                            <p class="mt-4 text-sm text-gray-500">
-                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="gallery_albums[${i}].items">${(album.items || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
-                            </p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-
-        function renderArticlesFull(data) {
-            const articleSection = document.getElementById('articles-section');
-            articleSection.innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('articles')}</h2>
-                <div class="space-y-4" id="article-list">
-                    ${data.articles.map((article, i) => `
-                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                            <div>
-                                <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
-                                   id="article-${i}-title" data-key="articles[${i}].title">
-                                    ${article.title}
-                                </a>
-                                <p class="text-gray-500 text-sm mt-1 content-editable-field"
-                                   id="article-${i}-source" data-key="articles[${i}].source">
-                                    ${article.source}
-                                </p>
-                                <p class="text-gray-500 text-sm mt-1">
-                                    Link: <span class="content-editable-field break-all" data-key="articles[${i}].link">${article.link}</span>
-                                </p>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-
-        // --- RENDER FUNCTIONS (PREVIEW/HOME PAGE) ---
-
-        // Preview functions render a simplified, non-editable subset and add a 'See More' button.
-
-        function renderResearchPreview(data) {
-            document.getElementById('research-section').innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview</h2>
-
-                <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
-                    <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
-                    <p class="text-gray-600 leading-relaxed min-h-[50px]">
-                        ${data.research.main_intro || initialContent.research.main_intro}
-                    </p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-8" id="research-sub-topics-preview">
-                    ${data.research.sub_topics.slice(0, PREVIEW_COUNT).map((topic, i) => `
-                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
-                            ${topic.image_url ? `
-                                <div class="mb-4">
-                                    <img src="${topic.image_url}" alt="${topic.title} illustration" 
-                                        class="w-full h-auto object-contain rounded-lg shadow-md magnify-on-hover" />
-                                </div>
-                            ` : ''}
-                            <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
-                                ${topic.title}
-                            </h4>
-                            <p class="text-gray-600 min-h-[50px] line-clamp-3">
-                                ${topic.content}
-                            </p>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="text-center mt-10">
-                    <a href="?page=research" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
-                        See More Research & Academic Details &rarr;
-                    </a>
-                </div>
-            `;
-        }
-
-        function renderPersonalPreview(data) {
-            document.getElementById('personal-section').innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
-
-                <div class="space-y-10" id="personal-life-memories-preview">
-                    ${data.personal_life.slice(0, PREVIEW_COUNT).map((memory, i) => `
-                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
-                            <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
-                                ${memory.title}
-                            </h4>
-                            <p class="text-gray-600 leading-relaxed line-clamp-2 mb-4">
-                                ${memory.content}
-                            </p>
-                    
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                                ${(memory.images || []).slice(0, 4).map(item => {
-                                    const url = typeof item === 'object' && item.url ? item.url : item;
-                                    return `<img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />`;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="text-center mt-10">
-                    <a href="?page=personal" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
-                        See All Personal Memories &rarr;
-                    </a>
-                </div>
-            `;
-        }
-
-        function renderGalleryPreview(data) {
-            // MODIFIED: Filter to show only the two requested albums
-            const albumsToShow = data.gallery_albums.filter(album => 
-                album.title === "Amazing Nature" || album.title === "3D Atomic Objects"
-            );
-
-            document.getElementById('gallery-section').innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums)</h2>
-
-                <div class="space-y-10" id="gallery-albums-preview">
-                    ${albumsToShow.map((album, i) => `
-                        <div class="bg-white p-6 rounded-xl shadow-xl">
-                            <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">
-                                ${album.title}
-                            </h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                                ${(album.items || []).slice(0, 4).map(item => {
-                                    const url = typeof item === 'object' && item.url ? item.url : item;
-                                    const isVideo = album.type === 'video';
-                                    if (isVideo) {
-                                        let embedUrl = url;
-                                        if (url.includes('youtube.com/watch?v=')) {
-                                            embedUrl = url.replace('watch?v=', 'embed/');
-                                        }
-                                        return `
-                                            <div class="space-y-2 aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                                <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
-                                            </div>
-                                        `;
-                                    } else {
-                                        // MODIFIED: Changed photo sizing and added magnify-on-hover
-                                        return `
-                                            <img src="${url}" alt="${album.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />
-                                        `;
-                                    }
-                                }).join('')}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="text-center mt-10">
-                    <a href="?page=gallery" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
-                        View All Albums & Media &rarr;
-                    </a>
-                </div>
-            `;
-        }
-
-        function renderArticlesPreview(data) {
-            document.getElementById('articles-section').innerHTML = `
-                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts</h2>
-
-                <div class="space-y-4" id="article-list-preview">
-                    ${data.articles.slice(0, PREVIEW_COUNT).map((article, i) => `
-                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                            <div>
-                                <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);">
-                                    ${article.title}
-                                </a>
-                                <p class="text-gray-500 text-sm mt-1">
-                                    ${article.source}
-                                </p>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="text-center mt-10">
-                    <a href="?page=articles" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
-                        Read All Articles & Thoughts &rarr;
-                    </a>
-                </div>
-            `;
-        }
-        
-        // Social Links (always rendered in the footer)
-        function renderSocialLinks(data) {
-            const socialContainer = document.getElementById('social-links-container');
-            socialContainer.innerHTML = data.social_links.map((link, i) => `
-                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
-                   id="social-${i}-name" data-key="social_links[${i}].name">
-                    ${link.name}
-                </a>
-                <span class="text-white hidden">
-                    URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
-                </span>
-            `).join('<span class="text-white">|</span>');
-        }
-
-
-        /** Renders the entire website content based on the provided data and current URL. */
-        function initRouter(data) {
-            if (!data) data = initialContent; // Fallback to initial data if snapshot is empty
-            const page = getPageFromUrl();
+        function initPage(data) {
+            if (!data) data = initialContent; 
             
-            // 1. Render Profile Sidebar (ALWAYS VISIBLE)
+            // 1. Render Global Components
             renderProfileSidebar(data); 
-
-            // 2. Hide all main content sections initially
-            document.querySelectorAll('#main-content-wrapper > section').forEach(sec => sec.classList.add('hidden'));
-            
-            // 3. Always render social links (for the footer)
             renderSocialLinks(data);
             
-            // 4. Main Page (Home)
-            if (!page) {
-                // Show ALL main sections
-                document.getElementById('research-section').classList.remove('hidden');
-                document.getElementById('education-section').classList.remove('hidden');
-                document.getElementById('presentations-section').classList.remove('hidden');
-                document.getElementById('awards-section').classList.remove('hidden');
-                document.getElementById('personal-section').classList.remove('hidden');
-                document.getElementById('gallery-section').classList.remove('hidden');
-                document.getElementById('articles-section').classList.remove('hidden');
+            // 2. Render ALL Home Page Sections
+            renderResearchPreview(data);
+            renderEducation(data);
+            renderPresentations(data);
+            renderHonors(data);
+            renderPersonalPreview(data);
+            renderGalleryPreview(data);
+            renderArticlesPreview(data);
 
-                // Render previews for the main 4 sections
-                renderResearchPreview(data);
-                renderPersonalPreview(data);
-                renderGalleryPreview(data);
-                renderArticlesPreview(data);
-
-                // Render FULL content for academic sections (now on the main page)
-                renderEducation(data);
-                renderPresentations(data);
-                renderHonors(data);
-
-            } else {
-                // 5. Sub-pages (Full Content Mode)
-                
-                switch (page) {
-                    case 'research':
-                        document.getElementById('research-section').classList.remove('hidden');
-                        renderResearchFull(data);
-                        // Academic sections are hidden on sub-pages
-                        break;
-                    case 'personal':
-                        document.getElementById('personal-section').classList.remove('hidden');
-                        renderPersonalFull(data);
-                        break;
-                    case 'gallery':
-                        document.getElementById('gallery-section').classList.remove('hidden');
-                        renderGalleryFull(data);
-                        break;
-                    case 'articles':
-                        document.getElementById('articles-section').classList.remove('hidden');
-                        renderArticlesFull(data);
-                        break;
-                    default:
-                        // Fallback to home if an invalid page is requested
-                        window.location.search = '';
-                        initRouter(data);
-                        break;
-                }
-            }
-            
-            // 6. Re-apply edit mode and hide loading
+            // 3. Hide loading and apply edit mode
             document.getElementById('loading-indicator').classList.add('hidden');
             if (isEditMode) {
                 document.querySelectorAll('.content-editable-field').forEach(el => {
@@ -795,100 +791,9 @@
             }
         }
 
-
-        /** Saves the current state of all editable fields back to Firestore. */
-        async function saveContent() {
-            if (!db || !userId) return console.error("Database or User ID not initialized for saving.");
-
-            const updatedContent = JSON.parse(JSON.stringify(initialContent)); // Start with a fresh copy
-            const editableElements = document.querySelectorAll('.content-editable-field');
-
-            editableElements.forEach(el => {
-                const key = el.dataset.key;
-                if (!key) return;
-
-                const value = el.textContent.trim();
-
-                // Function to set nested property (handles array indices)
-                const setNestedProperty = (obj, path, val) => {
-                    const parts = path.match(/[^.\[\]]+/g);
-                    let current = obj;
-                    for (let i = 0; i < parts.length; i++) {
-                        const part = parts[i];
-                        if (i === parts.length - 1) {
-                            // Check if the property should be an array (for media URLs)
-                            if (path.includes('.images') || path.includes('.items')) {
-                                // For simplicity, we are saving media URLs as a comma-separated string in edit mode
-                                // and then parsing it back into an array of strings on save.
-                                // NOTE: This simple parser does NOT support objects like {url: "", subtitle: ""}
-                                // The full content rendering functions have logic to handle the object structure correctly
-                                // from the JSON, but when saving the comma-separated list, it saves as an array of strings.
-                                // A more advanced editor would be needed to handle sub-objects like {url, subtitle}.
-                                current[part] = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
-                            } else {
-                                current[part] = val;
-                            }
-                            return;
-                        }
-
-                        let nextPart = parts[i + 1];
-                        if (!current[part]) {
-                            // Determine if the next part is an index (i.e., start of an array)
-                            if (!isNaN(parseInt(nextPart))) {
-                                current[part] = [];
-                            } else {
-                                current[part] = {};
-                            }
-                        }
-                        current = current[part];
-                    }
-                };
-
-                setNestedProperty(updatedContent, key, value);
-            });
-
-            try {
-                // Save the full public content document
-                await setDoc(doc(db, CONTENT_PATH), updatedContent);
-                console.log("Website content saved successfully!");
-            } catch (error) {
-                console.error("Error saving content to Firestore:", error);
-                // Note: Using a custom modal/toast message is preferred over standard alert()
-                console.warn("Failed to save content. Check the console for details.");
-            }
-        }
-
-        // --- THEME COLOR FUNCTIONS ---
-
-        function applyThemeColor(hexColor) {
-            themeColorHex = hexColor;
-            const style = document.documentElement.style;
-            // A simplified way to set color variables based on the chosen hex
-            style.setProperty('--theme-color-500', hexColor);
-            style.setProperty('--theme-color-600', hexColor);
-            style.setProperty('--theme-color-700', hexColor);
-            style.setProperty('--theme-color-800', hexColor);
-
-            // Set the color picker value
-            document.getElementById('color-picker').value = hexColor;
-        }
-
-        async function saveThemeColor() {
-            const newColor = document.getElementById('color-picker').value;
-            applyThemeColor(newColor);
-            document.getElementById('config-modal').classList.add('hidden');
-
-            if (db && userId) {
-                try {
-                    await setDoc(doc(db, CONFIG_PATH(userId)), { themeColor: newColor }, { merge: true });
-                    console.log("Theme color saved successfully!");
-                } catch (error) {
-                    console.error("Error saving theme color:", error);
-                }
-            }
-        }
-
-        // --- INITIALIZATION & AUTHENTICATION ---
+        // ====================================================================
+        // FIREBASE & APP SETUP (Used by ALL Pages)
+        // ====================================================================
 
         async function initializeFirebase() {
             try {
@@ -900,7 +805,6 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // 1. Authentication
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -909,47 +813,38 @@
 
                 onAuthStateChanged(auth, (user) => {
                     userId = user ? user.uid : null;
-                    isAuthReady = true;
                     document.getElementById('user-id-display').textContent = userId || 'N/A';
-                    console.log("Auth State Changed. User ID:", userId);
 
-                    // 2. Load Content (Public)
                     onSnapshot(doc(db, CONTENT_PATH), (docSnap) => {
                         const content = docSnap.exists() ? docSnap.data() : initialContent;
-                        initRouter(content);
-                        // Write initial content if the document doesn't exist
+                        initPage(content); // Call the specific initPage for this file
                         if (!docSnap.exists()) {
                             setDoc(doc(db, CONTENT_PATH), initialContent).catch(e => console.error("Error writing initial content:", e));
                         }
                     }, (error) => {
                         console.error("Error listening to public content:", error);
-                        // Render fallback content on error
-                        initRouter(initialContent);
+                        initPage(initialContent);
                     });
 
-                    // 3. Load Settings (Private)
                     if (userId) {
                         onSnapshot(doc(db, CONFIG_PATH(userId)), (docSnap) => {
                             if (docSnap.exists() && docSnap.data().themeColor) {
                                 applyThemeColor(docSnap.data().themeColor);
                             } else {
-                                applyThemeColor(themeColorHex); // Apply default
+                                applyThemeColor(themeColorHex); 
                             }
                         }, (error) => {
                             console.warn("Could not load private settings, using default theme.", error);
-                            applyThemeColor(themeColorHex); // Apply default on error
+                            applyThemeColor(themeColorHex);
                         });
                     }
                 });
 
                 document.getElementById('edit-mode-toggle').addEventListener('click', () => {
-                    // Only the authenticated user can use edit mode (since their settings doc is tied to their auth token)
                     if (userId) {
                         toggleEditMode(!isEditMode);
                     } else {
-                        // Using console.warn instead of alert() per guidelines
                         console.warn("Cannot enable Edit Mode. Authentication failed or user is not recognized as the owner.");
-                        // Optional: show a simple on-screen modal instead of alert
                     }
                 });
 
@@ -959,22 +854,15 @@
                     <p class="text-red-500 text-sm mt-2">The application could not load its content database. Please check console for details.</p>
                 `;
                 console.error("Firebase initialization failed:", error);
-                initRouter(initialContent); // Render initial dummy content
+                initPage(initialContent);
             }
         }
 
-        // Initialize the app on page load
         document.getElementById('current-year').textContent = new Date().getFullYear();
         initializeFirebase();
-
-        // Make saveThemeColor globally available for the button click in the modal
         window.saveThemeColor = saveThemeColor;
-
-        // Add event listener to save content when the browser is closed or refreshed while in edit mode
         window.addEventListener('beforeunload', () => {
             if (isEditMode) {
-                // Note: saveContent is an async function, but beforeunload does not wait for promises.
-                // We trust the Firestore SDK to handle the pending write operation.
                 saveContent();
             }
         });
