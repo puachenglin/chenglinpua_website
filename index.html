@@ -268,8 +268,11 @@
                     </div>
                     <div class="md:w-1/3 mt-4 md:mt-0 space-y-2">
                         ${(memory.images || []).map(url => `
-                            <img src="${url}" alt="${memory.title} image" class="w-full h-full object-cover rounded-lg shadow-sm"
-                                onerror="this.onerror=null; this.src='https://placehold.co/600x400/6B7280/FFFFFF?text=Image+Load+Error';" />
+                            <div class="rounded-lg shadow-sm overflow-hidden aspect-video"> 
+                                <img src="${url}" alt="${memory.title} image" 
+                                    class="w-full h-full object-contain transform hover:scale-[1.02] transition duration-300"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x400/6B7280/FFFFFF?text=Image+Load+Error';" />
+                            </div>
                         `).join('')}
                     </div>
                 </div>
