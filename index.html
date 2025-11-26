@@ -265,10 +265,6 @@
                             id="personal-life-${i}-content" data-key="personal_life[${i}].content">
                             ${memory.content}
                         </p>
-                        <p class="text-sm text-gray-500 mt-4">
-                            Image URLs (Edit Mode Only):
-                            <span class="content-editable-field break-all" data-key="personal_life[${i}].images">${(memory.images || []).join(', ')}</span>
-                        </p>
                     </div>
                     <div class="md:w-1/3 mt-4 md:mt-0 space-y-2">
                         ${(memory.images || []).map(url => `
@@ -287,10 +283,6 @@
                         id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title" class="content-editable-field">
                         ${album.title}
                     </h4>
-                    <p class="text-sm text-gray-500 mb-4">
-                        Media URLs (Comma separated):
-                        <span class="content-editable-field break-all" data-key="gallery_albums[${i}].items">${(album.items || []).join(', ')}</span>
-                    </p>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         ${(album.items || []).map(url => {
                             if (album.type === 'video') {
