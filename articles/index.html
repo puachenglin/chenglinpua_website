@@ -59,6 +59,11 @@
             <div class="md:col-span-1 mb-8 md:mb-0">
                 <div id="profile-sidebar" class="sticky top-24 bg-white p-6 rounded-xl shadow-lg">
                     <div id="profile-sidebar-content"></div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                        <button id="edit-mode-toggle" class="px-4 py-2 text-sm font-medium rounded-full bg-white text-gray-800 hover:bg-gray-100 transition duration-150 shadow-md">
+                            Enable Edit Mode
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -133,18 +138,262 @@
         const CONFIG_PATH = (uid) => `artifacts/${appId}/users/${uid}/website_settings/settings`;
         const CONTENT_PATH = `artifacts/${appId}/public/data/website_content/main_data`;
 
-        // IMPORTANT: The initialContent block must be the updated version from the prerequisite step.
-        const initialContent = { 
-            profile: { /* ... */ }, research: { /* ... */ }, education: [ /* ... */ ], 
-            presentations: [ /* ... */ ], honors_awards: [ /* ... */ ], 
-            personal_life: [ /* ... */ ], 
-            gallery_albums: [ /* ... */ ], articles: [ /* ... */ ], 
-            social_links: [ /* ... */ ] 
-        }; // Placeholder for the full updated object
+        // The complete and consistent content model across all pages
+        const initialContent = {
+            profile: {
+                name: "Chenglin Pua",
+                title: "PhD Candidate in Material Science at Tsinghua"
+            },
+            research: {
+                main_intro: "Hello world! I am a PhD candidate (Malaysian) in Materials Science at Tsinghua University, specializing in advanced electron microscopy techniques. My research focuses on scanning transmission electron microscopy (STEM), with a particular emphasis on multi-slice electron ptychography (MEP). Previously, I have worked on the structural analysis of offshore launching platforms during my bachelor’s studies and conducted atomic-scale characterization of 2D materials.",
+                sub_topics: [
+                    { 
+                        title: "Imaging Lunar Samples", 
+                        content: "What do solar flare tracks look like. This project uses advanced STEM imaging to analyze the structural changes in lunar soil caused by solar radiation, providing insights into space weathering processes. The full paper details the methodology and results of the atomic-scale characterization.", 
+                        figure_url_long: "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/research/solar_long_figure.png",
+                        journal_link: "https://www.nature.com/articles/lunarsamples",
+                        dataset_link: "https://zenodo.org/datasets/lunardata",
+                        youtube_link: null
+                    },
+                    { 
+                        title: "Imaging Hydrogen Atoms", 
+                        content: "Better atomic scale imaging of hydrogens using Multi-slice Electron Ptychography (MEP). This work is critical for understanding hydrogen storage materials and catalysts. MEP offers high-resolution, phase-retrieved images essential for visualizing light elements like hydrogen.", 
+                        figure_url_long: "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/research/hea_h_long_figure.png",
+                        journal_link: "https://www.science.org/doi/10.1126/science.hydrogen",
+                        dataset_link: null,
+                        youtube_link: "https://www.youtube.com/watch?v=MEP_demo_video"
+                    },
+                    { 
+                        title: "Offshore Launching Platform", 
+                        content: "Influence of hydrogen combustion and its mitigation on offshore launch platforms. This is an engineering safety project analyzing structural integrity under extreme conditions.", 
+                        figure_url_long: "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/research/offshore_long_figure.jpg",
+                        journal_link: "https://ieeexplore.ieee.org/abstract/offshore_safety",
+                        dataset_link: null,
+                        youtube_link: null
+                    }
+                ]
+            },
+            education: [
+                { degree: "Ph.D. in Materials Science", school: "Tsinghua University", years: "2025 - 2028" },
+                { degree: "M.S. in Materials Science", school: "Tsinghua University", years: "2022 - 2025" },
+                { degree: "B.S. in Mechanical Engineering", school: "Shanghai Jiao Tong University", years: "2018 - 2022" }
+            ],
+            presentations: [                
+                { title: " Simulation analysis and optimization of protective wall against hydrogen combustion from liquified hydrogen storage tank on the offshore launching platform (Oral)", venue: "European Hydrogen Energy Conference, Bilbao Spain", date: "Mar 2024" },
+                { title: "xxx", venue: "CEBE 2023, Shanghai, China", date: "Jul 2023" }
+            ],
+            honors_awards: [
+                { title: "Interview from China Daily", year: "2023" },
+                { title: "Outstanding Undergraduate Thesis", year: "2022" }
+            ],
+            // Updated to include 'content' and 'figure_url_long'
+            personal_life: [
+                { 
+                    title: "Japan Kyoto", 
+                    content: "It was my first time in Japan, and I was incredibly lucky to meet my idol, Jay Chou, while I was there! This was a memorable trip covering cultural landmarks and modern city life.", 
+                    figure_url_long: "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/japan_long_figure.jpg", 
+                    images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/jay_chou.png","https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/tokyo_japan.jpg"] 
+                },
+                { 
+                    title: "USA Silicon Valley", 
+                    content: "Photos from my trip to Silicon Valley, USA, during November 2024, focusing on tech culture and innovation hubs.", 
+                    figure_url_long: "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/silicon_long_figure.jpg", 
+                    images: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/silicon_2.jpg","https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/silicon_1.jpg"] 
+                }
+            ],
+            gallery_albums: [
+                { title: "Amazing Nature", type: "photo", items: ["https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/yiheyuan.jpeg", "https://raw.githubusercontent.com/puachenglin/chenglinpua_website/main/media/travel/me.jpeg"] },
+                { 
+                    title: "3D Atomic Objects", 
+                    type: "video", 
+                    items: [
+                        { url: "https://www.youtube.com/watch?v=Fw7JEITqc58", subtitle: "Poly-Si" },
+                        { url: "https://www.youtube.com/watch?v=3PXx0CkF7Fc", subtitle: "Lunar Soil" }
+                    ] 
+                }
+            ],
+            // Updated to include 'content'
+            articles: [
+                { 
+                    title: "Digital Sweatshops in the AI Era", 
+                    content: "A detailed analysis of the ethical implications and socio-economic changes brought about by the increasing use of AI in labor markets, particularly in data annotation and content moderation.", 
+                    source: "Lianhe Zaobao, Singapore", 
+                    link: "https://www.zaobao.com.sg/forum/views/story20250919-7535380" 
+                },
+                { 
+                    title: "The Gambler's Fallacy", 
+                    content: "Exploring the psychological biases and mathematical misunderstandings behind the gambler's fallacy and how it influences everyday decision-making.", 
+                    source: "Sin Chew Daily, Malaysia", 
+                    link: "https://www.sinchew.com.my/news/20210320/supplement/3144313" 
+                }
+            ],
+            social_links: [
+                { name: "ResearchGate", url: "https://www.researchgate.net/profile/Pua-Chenglin/" },
+                { name: "Google Scholar", url: "https://scholar.google.com/citations?user=OSv_Bm4AAAAJ&hl=en/" },
+                { name: "YouTube", url: "https://www.youtube.com/@AtomiMuseum/" },
+                { name: "BiliBili", url: "https://space.bilibili.com/3493105227533275/" },
+            ]
+        };
 
-        // Placeholder for shared UI functions (toggleEditMode, renderProfileSidebar, renderSocialLinks, saveContent, applyThemeColor, saveThemeColor, initializeFirebase)
-        // You should copy these functions from the research/index.html file or the main index.html file.
+        // ====================================================================
+        // SHARED UI FUNCTIONS (Copied from researchindex.html)
+        // ====================================================================
 
+        function toggleEditMode(enable) {
+            isEditMode = enable;
+            const toggleButton = document.getElementById('edit-mode-toggle');
+            const editableElements = document.querySelectorAll('.content-editable-field');
+
+            if (isEditMode) {
+                toggleButton.textContent = 'Exit Edit Mode';
+                toggleButton.classList.remove('bg-white', 'text-gray-800');
+                toggleButton.classList.add('bg-red-500', 'text-white');
+                editableElements.forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                    el.style.cursor = 'text';
+                });
+                const configButton = document.createElement('button');
+                configButton.id = 'config-btn';
+                configButton.innerHTML = '⚙️ Config';
+                configButton.className = 'px-4 py-2 text-sm font-medium rounded-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition duration-150 shadow-md ml-4';
+                configButton.onclick = () => document.getElementById('config-modal').classList.remove('hidden');
+                document.getElementById('edit-mode-toggle').parentElement.appendChild(configButton);
+
+            } else {
+                toggleButton.textContent = 'Enable Edit Mode';
+                toggleButton.classList.add('bg-white', 'text-gray-800');
+                toggleButton.classList.remove('bg-red-500', 'text-white');
+                editableElements.forEach(el => {
+                    el.removeAttribute('contenteditable');
+                    el.style.cursor = 'default';
+                });
+                const configBtn = document.getElementById('config-btn');
+                if (configBtn) configBtn.remove();
+                saveContent();
+            }
+        }
+        
+        function renderProfileSidebar(data) {
+            const profileContainer = document.getElementById('profile-sidebar-content');
+            const profileImageUrl = "https://placehold.co/150x150/1D4ED8/FFFFFF?text=CP"; 
+            const profileName = data.profile?.name || initialContent.profile.name;
+            const profileTitle = data.profile?.title || initialContent.profile.title;
+
+            profileContainer.innerHTML = `
+                <div class="text-center">
+                    <img src="${profileImageUrl}" alt="${profileName} Profile Picture" 
+                         class="w-24 h-24 rounded-full mx-auto object-cover mb-4 shadow-md" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/96x96/1D4ED8/FFFFFF?text=CP';" />
+                    
+                    <h3 class="text-xl font-bold mb-1 content-editable-field" data-key="profile.name">
+                        ${profileName}
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4 content-editable-field" data-key="profile.title">
+                        ${profileTitle}
+                    </p>
+
+                    <div class="space-y-3 pt-4 border-t border-gray-100">
+                        ${data.social_links.map(link => {
+                            if (['Google Scholar', 'ResearchGate', 'YouTube', 'BiliBili'].includes(link.name)) {
+                                return `
+                                    <a href="${link.url}" target="_blank" class="flex items-center justify-center text-sm font-medium text-gray-700 hover:text-gray-900 transition duration-150">
+                                        ${link.name} &rarr;
+                                    </a>
+                                `;
+                            }
+                            return '';
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSocialLinks(data) {
+            const socialContainer = document.getElementById('social-links-container');
+            socialContainer.innerHTML = data.social_links.map((link, i) => `
+                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
+                   id="social-${i}-name" data-key="social_links[${i}].name">
+                    ${link.name}
+                </a>
+                <span class="text-white hidden">
+                    URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
+                </span>
+            `).join('<span class="text-white">|</span>');
+        }
+
+        async function saveContent() {
+            if (!db || !userId) return console.error("Database or User ID not initialized for saving.");
+
+            const updatedContent = JSON.parse(JSON.stringify(initialContent));
+            const editableElements = document.querySelectorAll('.content-editable-field');
+
+            editableElements.forEach(el => {
+                const key = el.dataset.key;
+                if (!key) return;
+
+                const value = el.textContent.trim();
+
+                const setNestedProperty = (obj, path, val) => {
+                    const parts = path.match(/[^.\[\]]+/g);
+                    let current = obj;
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (i === parts.length - 1) {
+                            if (path.includes('.images') || path.includes('.items')) {
+                                current[part] = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                            } else {
+                                current[part] = val;
+                            }
+                            return;
+                        }
+
+                        let nextPart = parts[i + 1];
+                        if (!current[part]) {
+                            if (!isNaN(parseInt(nextPart))) {
+                                current[part] = [];
+                            } else {
+                                current[part] = {};
+                            }
+                        }
+                        current = current[part];
+                    }
+                };
+                setNestedProperty(updatedContent, key, value);
+            });
+
+            try {
+                await setDoc(doc(db, CONTENT_PATH), updatedContent);
+                console.log("Website content saved successfully!");
+            } catch (error) {
+                console.error("Error saving content to Firestore:", error);
+                console.warn("Failed to save content. Check the console for details.");
+            }
+        }
+
+        function applyThemeColor(hexColor) {
+            themeColorHex = hexColor;
+            const style = document.documentElement.style;
+            style.setProperty('--theme-color-500', hexColor);
+            style.setProperty('--theme-color-600', hexColor);
+            style.setProperty('--theme-color-700', hexColor);
+            style.setProperty('--theme-color-800', hexColor);
+            document.getElementById('color-picker').value = hexColor;
+        }
+
+        async function saveThemeColor() {
+            const newColor = document.getElementById('color-picker').value;
+            applyThemeColor(newColor);
+            document.getElementById('config-modal').classList.add('hidden');
+
+            if (db && userId) {
+                try {
+                    await setDoc(doc(db, CONFIG_PATH(userId)), { themeColor: newColor }, { merge: true });
+                    console.log("Theme color saved successfully!");
+                } catch (error) {
+                    console.error("Error saving theme color:", error);
+                }
+            }
+        }
 
         // ====================================================================
         // FULL CONTENT RENDER FUNCTION (ARTICLES)
@@ -212,14 +461,77 @@
             }
         }
         
-        // --- Remaining Shared Functions (Must be copied from main index.html) ---
-        // (toggleEditMode, renderProfileSidebar, renderSocialLinks, saveContent, applyThemeColor, saveThemeColor, initializeFirebase)
-        // ...
+        // ====================================================================
+        // FIREBASE & APP SETUP (Copied from researchindex.html)
+        // ====================================================================
+
+        async function initializeFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    throw new Error("Firebase configuration is missing or empty.");
+                }
+
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    userId = user ? user.uid : null;
+                    document.getElementById('user-id-display').textContent = userId || 'N/A';
+
+                    onSnapshot(doc(db, CONTENT_PATH), (docSnap) => {
+                        const content = docSnap.exists() ? docSnap.data() : initialContent;
+                        initPage(content); 
+                        if (!docSnap.exists()) {
+                            setDoc(doc(db, CONTENT_PATH), initialContent).catch(e => console.error("Error writing initial content:", e));
+                        }
+                    }, (error) => {
+                        console.error("Error listening to public content:", error);
+                        initPage(initialContent);
+                    });
+
+                    if (userId) {
+                        onSnapshot(doc(db, CONFIG_PATH(userId)), (docSnap) => {
+                            if (docSnap.exists() && docSnap.data().themeColor) {
+                                applyThemeColor(docSnap.data().themeColor);
+                            } else {
+                                applyThemeColor(themeColorHex); 
+                            }
+                        }, (error) => {
+                            console.warn("Could not load private settings, using default theme.", error);
+                            applyThemeColor(themeColorHex);
+                        });
+                    }
+                });
+
+                document.getElementById('edit-mode-toggle').addEventListener('click', () => {
+                    if (userId) {
+                        toggleEditMode(!isEditMode);
+                    } else {
+                        console.warn("Cannot enable Edit Mode. Authentication failed or user is not recognized as the owner.");
+                    }
+                });
+
+            } catch (error) {
+                document.getElementById('loading-indicator').innerHTML = `
+                    <p class="text-red-600 text-lg">Error Initializing Firebase:</p>
+                    <p class="text-red-500 text-sm mt-2">The application could not load its content database. Please check console for details.</p>
+                `;
+                console.error("Firebase initialization failed:", error);
+                initPage(initialContent);
+            }
+        }
         
         document.getElementById('current-year').textContent = new Date().getFullYear();
-        // initializeFirebase(); // Uncomment this line and ensure the shared functions are present
+        initializeFirebase();
         window.saveThemeColor = saveThemeColor;
-        window.addEventListener('beforeunload', () => { if (isEditMode) { /* saveContent(); */ } });
+        window.addEventListener('beforeunload', () => { if (isEditMode) { saveContent(); } });
     </script>
 </body>
 </html>
