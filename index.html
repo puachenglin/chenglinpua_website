@@ -27,6 +27,19 @@
             outline: 2px solid var(--theme-color-500, #3b82f6);
             cursor: text;
         }
+        /* Utility class for preview content truncation */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -35,13 +48,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
             <h1 class="text-3xl font-extrabold tracking-tight text-white">Chenglin Pua</h1>
             <nav class="hidden md:flex space-x-6">
-                <a href="#research" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
-                <a href="#education" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Education</a>
-                <a href="#presentations" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Presentations</a>
-                <a href="#awards" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Awards</a>
-                <a href="#personal" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
-                <a href="#gallery" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
-                <a href="#articles" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
+                <a href="./" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Home</a>
+                <a href="?page=research" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
+                <a href="?page=personal" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
+                <a href="?page=gallery" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
+                <a href="?page=articles" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
             </nav>
 
         </div>
@@ -54,58 +65,35 @@
             <p class="mt-4 text-lg text-gray-600">Loading website content...</p>
         </div>
 
-        <section id="research" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview</h2>
-
-            <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
-                <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
-                <p id="research-main-intro" class="text-gray-600 leading-relaxed min-h-[50px] content-editable-field" data-key="research.main_intro">
-                    Hello world! I am a PhD candidate (Malaysian) in Materials Science at Tsinghua University, specializing in advanced electron microscopy techniques. My research focuses on scanning transmission electron microscopy (STEM), with a particular emphasis on multi-slice electron ptychography (MEP). Previously, I have worked on the structural analysis of offshore launching platforms during my bachelor’s studies and conducted atomic-scale characterization of 2D materials. 
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8" id="research-sub-topics">
-                </div>
-        </section>
+        <section id="research-section" class="scroll-mt-24">
+            </section>
         
-        <section id="education" class="scroll-mt-24">
+        <section id="education-section" class="scroll-mt-24">
             <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🎓 Education</h2>
             <div class="space-y-4" id="education-list">
                 </div>
         </section>
         
-        <section id="presentations" class="scroll-mt-24">
+        <section id="presentations-section" class="scroll-mt-24">
             <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🗣️ Presentations</h2>
             <div class="space-y-4" id="presentations-list">
                 </div>
         </section>
         
-        <section id="awards" class="scroll-mt-24">
+        <section id="awards-section" class="scroll-mt-24">
             <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🏆 Honors & Awards</h2>
             <div class="space-y-4" id="honors-list">
                 </div>
         </section>
 
-        <section id="personal" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
+        <section id="personal-section" class="scroll-mt-24">
+            </section>
 
-            <div class="space-y-10" id="personal-life-memories">
-                </div>
-        </section>
+        <section id="gallery-section" class="scroll-mt-24">
+            </section>
 
-        <section id="gallery" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums)</h2>
-
-            <div class="space-y-10" id="gallery-albums">
-                </div>
-        </section>
-
-        <section id="articles" class="scroll-mt-24">
-            <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts</h2>
-
-            <div class="space-y-4" id="article-list">
-                </div>
-        </section>
+        <section id="articles-section" class="scroll-mt-24">
+            </section>
     </main>
 
     <footer class="mt-16 py-8" style="background-color: var(--theme-color-800, #1e40af);">
@@ -221,6 +209,8 @@
             ]
         };
 
+        const PREVIEW_COUNT = 2; // Number of items to show in the preview sections
+
         // --- CORE UI FUNCTIONS ---
 
         /** Toggles the edit mode and updates the UI. */
@@ -259,223 +249,492 @@
                 saveContent();
             }
         }
+        
+        // --- ROUTING HELPERS ---
+        
+        function getPageFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('page'); // 'research', 'personal', 'gallery', 'articles' or null
+        }
 
-        /** Renders the entire website content based on the provided data. */
-        function renderContent(data) {
-            document.getElementById('loading-indicator').classList.add('hidden');
-            if (!data) data = initialContent; // Fallback to initial data if snapshot is empty
+        function getRouterTitle(page) {
+            switch(page) {
+                case 'research': return '🔬 Research Overview (Full Academic Portfolio)';
+                case 'education': return '🎓 Education';
+                case 'presentations': return '🗣️ Presentations';
+                case 'awards': return '🏆 Honors & Awards';
+                case 'personal': return '✈️ Personal Life & Travels (Full Album)';
+                case 'gallery': return '🖼️ Gallery & Media (Albums) (Full)';
+                case 'articles': return '📰 Articles & Published Thoughts (Full List)';
+                default: return '';
+            }
+        }
 
-            // --- 1. RESEARCH SECTION ---
-            document.getElementById('research-main-intro').textContent = data.research.main_intro || initialContent.research.main_intro;
-            document.getElementById('research-main-intro').dataset.key = 'research.main_intro';
+        // --- RENDER FUNCTIONS (FULL PAGE) ---
 
-            const researchContainer = document.getElementById('research-sub-topics');
-            researchContainer.innerHTML = data.research.sub_topics.map((topic, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
-                    
-                    ${topic.image_url ? `
-                        <div class="mb-4">
-                            <img src="${topic.image_url}" alt="${topic.title} illustration" 
-                                class="w-full h-full object-cover rounded-lg shadow-md transform hover:scale-[1.01] transition duration-300"
-                                onerror="this.onerror=null; this.src='https://placehold.co/600x240/1D4ED8/FFFFFF?text=Image+for+Research+Topic';" />
-                        </div>
-                    ` : ''}
-            
-                    <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
-                        id="research-sub-topics-${i}-title" data-key="research.sub_topics[${i}].title" class="content-editable-field">
-                        ${topic.title}
-                    </h4>
-                    <p class="text-gray-600 content-editable-field min-h-[50px]"
-                        id="research-sub-topics-${i}-content" data-key="research.sub_topics[${i}].content">
-                        ${topic.content}
+        // All "Full" render functions replace the content of their section and make fields editable.
+        
+        function renderResearchFull(data) {
+            const researchSection = document.getElementById('research-section');
+            researchSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('research')}</h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
+                    <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
+                    <p id="research-main-intro" class="text-gray-600 leading-relaxed min-h-[50px] content-editable-field" data-key="research.main_intro">
+                        ${data.research.main_intro || initialContent.research.main_intro}
                     </p>
                 </div>
-            `).join('');
 
-            // --- 2. EDUCATION SECTION ---
+                <div class="grid md:grid-cols-3 gap-8" id="research-sub-topics">
+                    ${data.research.sub_topics.map((topic, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
+                            
+                            ${topic.image_url ? `
+                                <div class="mb-4">
+                                    <img src="${topic.image_url}" alt="${topic.title} illustration" 
+                                        class="w-full h-40 object-cover rounded-lg shadow-md transform hover:scale-[1.01] transition duration-300"
+                                        onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
+                                </div>
+                            ` : ''}
+                    
+                            <h4 class="text-xl font-semibold mb-3 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="research-sub-topics-${i}-title" data-key="research.sub_topics[${i}].title">
+                                ${topic.title}
+                            </h4>
+                            <p class="text-gray-600 content-editable-field min-h-[50px]"
+                                id="research-sub-topics-${i}-content" data-key="research.sub_topics[${i}].content">
+                                ${topic.content}
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Img URL: <span class="content-editable-field break-all" data-key="research.sub_topics[${i}].image_url">${topic.image_url || ''}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderEducationFull(data) {
+            const educationSection = document.getElementById('education-section');
+            educationSection.querySelector('h2').textContent = getRouterTitle('education');
             const educationContainer = document.getElementById('education-list');
             educationContainer.innerHTML = (data.education || []).map((edu, i) => `
                 <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
                     <div class="flex-grow">
-                        <p class="text-xl font-semibold" style="color: var(--theme-color-600, #4f46e5);"
-                           id="education-${i}-degree" data-key="education[${i}].degree" class="content-editable-field">
+                        <p class="text-xl font-semibold content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                           id="education-${i}-degree" data-key="education[${i}].degree">
                             ${edu.degree}
                         </p>
-                        <p class="text-gray-600 text-lg mt-1"
-                           id="education-${i}-school" data-key="education[${i}].school" class="content-editable-field">
+                        <p class="text-gray-600 text-lg mt-1 content-editable-field"
+                           id="education-${i}-school" data-key="education[${i}].school">
                             ${edu.school}
                         </p>
                     </div>
-                    <p class="text-gray-500 text-base"
-                       id="education-${i}-years" data-key="education[${i}].years" class="content-editable-field">
+                    <p class="text-gray-500 text-base content-editable-field"
+                       id="education-${i}-years" data-key="education[${i}].years">
                         ${edu.years}
                     </p>
                 </div>
             `).join('');
-            
-            // --- 3. PRESENTATIONS SECTION ---
+        }
+        
+        function renderPresentationsFull(data) {
+            const presentationsSection = document.getElementById('presentations-section');
+            presentationsSection.querySelector('h2').textContent = getRouterTitle('presentations');
             const presentationsContainer = document.getElementById('presentations-list');
             presentationsContainer.innerHTML = (data.presentations || []).map((pres, i) => `
                 <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-start">
                     <div class="flex-grow md:w-3/4 pr-4">
-                        <p class="text-lg font-semibold" style="color: var(--theme-color-600, #4f46e5);"
-                           id="presentation-${i}-title" data-key="presentations[${i}].title" class="content-editable-field">
+                        <p class="text-lg font-semibold content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                           id="presentation-${i}-title" data-key="presentations[${i}].title">
                             ${pres.title}
                         </p>
-                        <p class="text-gray-600 text-base mt-1"
-                           id="presentation-${i}-venue" data-key="presentations[${i}].venue" class="content-editable-field">
+                        <p class="text-gray-600 text-base mt-1 content-editable-field"
+                           id="presentation-${i}-venue" data-key="presentations[${i}].venue">
                             ${pres.venue}
                         </p>
                     </div>
-                    <p class="text-gray-500 text-base md:w-1/4 text-right"
-                       id="presentation-${i}-date" data-key="presentations[${i}].date" class="content-editable-field">
+                    <p class="text-gray-500 text-base md:w-1/4 text-right content-editable-field"
+                       id="presentation-${i}-date" data-key="presentations[${i}].date">
                         ${pres.date}
                     </p>
                 </div>
             `).join('');
+        }
 
-            // --- 4. HONORS AND AWARDS SECTION ---
+        function renderHonorsFull(data) {
+            const awardsSection = document.getElementById('awards-section');
+            awardsSection.querySelector('h2').textContent = getRouterTitle('awards');
             const honorsContainer = document.getElementById('honors-list');
             honorsContainer.innerHTML = (data.honors_awards || []).map((award, i) => `
                 <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                    <p class="text-lg font-semibold text-gray-700"
-                       id="honors-${i}-title" data-key="honors_awards[${i}].title" class="content-editable-field">
+                    <p class="text-lg font-semibold text-gray-700 content-editable-field"
+                       id="honors-${i}-title" data-key="honors_awards[${i}].title">
                         ${award.title}
                     </p>
-                    <p class="text-gray-500 text-base"
-                       id="honors-${i}-year" data-key="honors_awards[${i}].year" class="content-editable-field">
+                    <p class="text-gray-500 text-base content-editable-field"
+                       id="honors-${i}-year" data-key="honors_awards[${i}].year">
                         ${award.year}
                     </p>
                 </div>
             `).join('');
+        }
 
 
-            // --- 5. PERSONAL LIFE SECTION ---
-            const personalContainer = document.getElementById('personal-life-memories');
-            personalContainer.innerHTML = data.personal_life.map((memory, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-xl"> 
-                    <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);"
-                        id="personal-life-${i}-title" data-key="personal_life[${i}].title" class="content-editable-field">
-                        ${memory.title}
-                    </h4>
-                    <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
-                        id="personal-life-${i}-content" data-key="personal_life[${i}].content">
-                        ${memory.content}
+        function renderPersonalFull(data) {
+            const personalSection = document.getElementById('personal-section');
+            personalSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('personal')}</h2>
+                <div class="space-y-10" id="personal-life-memories">
+                    ${data.personal_life.map((memory, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
+                            <h4 class="text-2xl font-semibold mb-3 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="personal-life-${i}-title" data-key="personal_life[${i}].title">
+                                ${memory.title}
+                            </h4>
+                            <p class="text-gray-600 leading-relaxed content-editable-field mb-4"
+                                id="personal-life-${i}-content" data-key="personal_life[${i}].content">
+                                ${memory.content}
+                            </p>
+                    
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(memory.images || []).map(item => { 
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+                                    const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
+                    
+                                    if (isVideo) {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2"> 
+                                                <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                </div>
+                                                ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <img src="${url}" alt="${memory.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
+                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                            <p class="mt-4 text-sm text-gray-500">
+                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="personal_life[${i}].images">${(memory.images || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+
+        function renderGalleryFull(data) {
+            const gallerySection = document.getElementById('gallery-section');
+            gallerySection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('gallery')}</h2>
+                <div class="space-y-10" id="gallery-albums">
+                    ${data.gallery_albums.map((album, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl">
+                            <h4 class="text-2xl font-semibold mb-4 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title">
+                                ${album.title}
+                            </h4>
+                            <p class="text-sm text-gray-500 mb-4">Album Type: <span class="content-editable-field" data-key="gallery_albums[${i}].type">${album.type}</span></p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(album.items || []).map((item, j) => { 
+                                    
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
+                    
+                                    if (album.type === 'video') {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                    <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                </div>
+                                                ${subtitle ? `<p class="text-sm text-center text-gray-500 content-editable-field" data-key="gallery_albums[${i}].items[${j}].subtitle">${subtitle}</p>` : ''}
+                                            </div>
+                                        `;
+                                    } else {
+                                        // Photos
+                                        return `
+                                            <img src="${url}" alt="${album.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
+                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                            <p class="mt-4 text-sm text-gray-500">
+                                Media URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="gallery_albums[${i}].items">${(album.items || []).map(item => typeof item === 'object' && item.url ? item.url : item).join(', ')}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+
+        function renderArticlesFull(data) {
+            const articleSection = document.getElementById('articles-section');
+            articleSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">${getRouterTitle('articles')}</h2>
+                <div class="space-y-4" id="article-list">
+                    ${data.articles.map((article, i) => `
+                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                            <div>
+                                <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                   id="article-${i}-title" data-key="articles[${i}].title">
+                                    ${article.title}
+                                </a>
+                                <p class="text-gray-500 text-sm mt-1 content-editable-field"
+                                   id="article-${i}-source" data-key="articles[${i}].source">
+                                    ${article.source}
+                                </p>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    Link: <span class="content-editable-field break-all" data-key="articles[${i}].link">${article.link}</span>
+                                </p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+
+        // --- RENDER FUNCTIONS (PREVIEW/HOME PAGE) ---
+
+        // Preview functions render a simplified, non-editable subset and add a 'See More' button.
+
+        function renderResearchPreview(data) {
+            document.getElementById('research-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🔬 Research Overview</h2>
+
+                <div class="bg-white p-8 rounded-xl shadow-xl mb-12">
+                    <h3 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">My Research Focus</h3>
+                    <p class="text-gray-600 leading-relaxed min-h-[50px] line-clamp-3">
+                        ${data.research.main_intro || initialContent.research.main_intro}
                     </p>
-            
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${(memory.images || []).map(item => { // We assume 'images' contains all media items (photos/videos)
-            
-                            // Helper to get URL and Subtitle, supporting the Gallery object format: { url: "...", subtitle: "..." }
-                            const url = typeof item === 'object' && item.url ? item.url : item;
-                            const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-            
-                            // Determine if the item is a video by checking the URL
-                            const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('bilibili.com'); 
-            
-                            if (isVideo) {
-                                // Video Rendering Logic (from Gallery)
-                                let embedUrl = url;
-                                if (url.includes('youtube.com/watch?v=')) {
-                                    embedUrl = url.replace('watch?v=', 'embed/');
-                                }
-                                return `
-                                    <div class="space-y-2"> 
-                                        <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                            <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                        </div>
-                                        ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
-                                    </div>
-                                `;
-                            } else {
-                                // Photo Rendering Logic (from Gallery)
-                                return `
-                                    <img src="${url}" alt="${memory.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
-                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                `;
-                            }
-                        }).join('')}
-                    </div>
                 </div>
-            `).join('');
 
-            // --- 6. GALLERY SECTION (Albums) ---
-            const galleryContainer = document.getElementById('gallery-albums');
-            galleryContainer.innerHTML = data.gallery_albums.map((album, i) => `
-                <div class="bg-white p-6 rounded-xl shadow-xl">
-                    <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);"
-                        id="gallery-album-${i}-title" data-key="gallery_albums[${i}].title" class="content-editable-field">
-                        ${album.title}
-                    </h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${(album.items || []).map(item => { // 'item' is now a video object or a photo URL string
-                            
-                            // Helper to get URL and Subtitle, handling both new objects and old strings
-                            const url = typeof item === 'object' && item.url ? item.url : item;
-                            const subtitle = typeof item === 'object' && item.subtitle ? item.subtitle : '';
-            
-                            if (album.type === 'video') {
-                                // Assume videos are embed links (YouTube, BiliBili)
-                                let embedUrl = url;
-                                if (url.includes('youtube.com/watch?v=')) {
-                                    embedUrl = url.replace('watch?v=', 'embed/');
-                                }
-                                return `
-                                    <div class="space-y-2"> <div class="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                                            <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                        </div>
-                                        ${subtitle ? `<p class="text-sm text-center text-gray-500">${subtitle}</p>` : ''}
-                                    </div>
-                                `;
-                            } else {
-                                // Photos
-                                return `
-                                    <img src="${url}" alt="${album.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg transform hover:scale-[1.02] transition duration-300"
-                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                `;
-                            }
-                        }).join('')}
-                    </div>
+                <div class="grid md:grid-cols-2 gap-8" id="research-sub-topics-preview">
+                    ${data.research.sub_topics.slice(0, PREVIEW_COUNT).map((topic, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
+                            ${topic.image_url ? `
+                                <div class="mb-4">
+                                    <img src="${topic.image_url}" alt="${topic.title} illustration" 
+                                        class="w-full h-40 object-cover rounded-lg shadow-md" />
+                                </div>
+                            ` : ''}
+                            <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
+                                ${topic.title}
+                            </h4>
+                            <p class="text-gray-600 min-h-[50px] line-clamp-3">
+                                ${topic.content}
+                            </p>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
-
-
-            // --- 7. ARTICLE SECTION ---
-            const articleContainer = document.getElementById('article-list');
-            articleContainer.innerHTML = data.articles.map((article, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
-                    <div>
-                        <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);"
-                           id="article-${i}-title" data-key="articles[${i}].title" class="content-editable-field">
-                            ${article.title}
-                        </a>
-                        <p class="text-gray-500 text-sm mt-1"
-                           id="article-${i}-source" data-key="articles[${i}].source" class="content-editable-field">
-                            ${article.source}
-                        </p>
-                    </div>
+                <div class="text-center mt-10">
+                    <a href="?page=research" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        See More Research & Academic Details &rarr;
+                    </a>
                 </div>
-            `).join('');
+            `;
+        }
 
-            // --- 8. SOCIAL LINKS (FOOTER) ---
+        function renderPersonalPreview(data) {
+            document.getElementById('personal-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
+
+                <div class="space-y-10" id="personal-life-memories-preview">
+                    ${data.personal_life.slice(0, 1).map((memory, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl"> 
+                            <h4 class="text-2xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
+                                ${memory.title}
+                            </h4>
+                            <p class="text-gray-600 leading-relaxed line-clamp-2 mb-4">
+                                ${memory.content}
+                            </p>
+                    
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(memory.images || []).slice(0, 4).map(item => {
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    return `<img src="${url}" alt="${memory.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg" />`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="?page=personal" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        See All Personal Memories &rarr;
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderGalleryPreview(data) {
+            document.getElementById('gallery-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (Albums)</h2>
+
+                <div class="space-y-10" id="gallery-albums-preview">
+                    ${data.gallery_albums.slice(0, 1).map((album, i) => `
+                        <div class="bg-white p-6 rounded-xl shadow-xl">
+                            <h4 class="text-2xl font-semibold mb-4" style="color: var(--theme-color-600, #4f46e5);">
+                                ${album.title}
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${(album.items || []).slice(0, 4).map(item => {
+                                    const url = typeof item === 'object' && item.url ? item.url : item;
+                                    const isVideo = album.type === 'video';
+                                    if (isVideo) {
+                                        let embedUrl = url;
+                                        if (url.includes('youtube.com/watch?v=')) {
+                                            embedUrl = url.replace('watch?v=', 'embed/');
+                                        }
+                                        return `
+                                            <div class="space-y-2 aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                                                <iframe class="w-full h-full" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+                                            </div>
+                                        `;
+                                    } else {
+                                        return `
+                                            <img src="${url}" alt="${album.title} media" class="w-full aspect-square object-cover rounded-lg shadow-lg" />
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="?page=gallery" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        View All Albums & Media &rarr;
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderArticlesPreview(data) {
+            document.getElementById('articles-section').innerHTML = `
+                <h2 class="text-4xl font-bold mb-8 text-center" style="color: var(--theme-color-700, #3730a3);">📰 Articles & Published Thoughts</h2>
+
+                <div class="space-y-4" id="article-list-preview">
+                    ${data.articles.slice(0, PREVIEW_COUNT).map((article, i) => `
+                        <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+                            <div>
+                                <a href="${article.link || '#'}" target="_blank" class="text-xl font-semibold hover:underline" style="color: var(--theme-color-600, #4f46e5);">
+                                    ${article.title}
+                                </a>
+                                <p class="text-gray-500 text-sm mt-1">
+                                    ${article.source}
+                                </p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-10">
+                    <a href="?page=articles" class="px-8 py-3 font-medium rounded-lg text-white transition duration-150 shadow-md hover:opacity-90" style="background-color: var(--theme-color-600, #4f46e5);">
+                        Read All Articles & Thoughts &rarr;
+                    </a>
+                </div>
+            `;
+        }
+        
+        // Social Links (always rendered in the footer)
+        function renderSocialLinks(data) {
             const socialContainer = document.getElementById('social-links-container');
             socialContainer.innerHTML = data.social_links.map((link, i) => `
-                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium"
-                   id="social-${i}-name" data-key="social_links[${i}].name" class="content-editable-field">
+                <a href="${link.url}" target="_blank" class="text-white hover:text-opacity-80 transition duration-150 text-lg font-medium content-editable-field"
+                   id="social-${i}-name" data-key="social_links[${i}].name">
                     ${link.name}
                 </a>
                 <span class="text-white hidden">
                     URL (Edit Mode): <span class="content-editable-field break-all" data-key="social_links[${i}].url">${link.url}</span>
                 </span>
             `).join('<span class="text-white">|</span>');
+        }
 
-            // Re-apply editable attributes after content is re-rendered
+
+        /** Renders the entire website content based on the provided data and current URL. */
+        function initRouter(data) {
+            if (!data) data = initialContent; // Fallback to initial data if snapshot is empty
+            const page = getPageFromUrl();
+            
+            // 1. Hide all sections initially (but keep their structure)
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            
+            // 2. Always render social links
+            renderSocialLinks(data);
+            
+            // 3. Main Page (Home)
+            if (!page) {
+                // Show only the four main sections on the home page
+                document.getElementById('research-section').classList.remove('hidden');
+                document.getElementById('personal-section').classList.remove('hidden');
+                document.getElementById('gallery-section').classList.remove('hidden');
+                document.getElementById('articles-section').classList.remove('hidden');
+
+                // Render previews with 'See More' buttons
+                renderResearchPreview(data);
+                renderPersonalPreview(data);
+                renderGalleryPreview(data);
+                renderArticlesPreview(data);
+
+            } else {
+                // 4. Sub-pages (Full Content Mode)
+                
+                switch (page) {
+                    case 'research':
+                        // Show research and its academic sub-sections
+                        document.getElementById('research-section').classList.remove('hidden');
+                        document.getElementById('education-section').classList.remove('hidden');
+                        document.getElementById('presentations-section').classList.remove('hidden');
+                        document.getElementById('awards-section').classList.remove('hidden');
+                        renderResearchFull(data);
+                        renderEducationFull(data);
+                        renderPresentationsFull(data);
+                        renderHonorsFull(data);
+                        break;
+                    case 'personal':
+                        document.getElementById('personal-section').classList.remove('hidden');
+                        renderPersonalFull(data);
+                        break;
+                    case 'gallery':
+                        document.getElementById('gallery-section').classList.remove('hidden');
+                        renderGalleryFull(data);
+                        break;
+                    case 'articles':
+                        document.getElementById('articles-section').classList.remove('hidden');
+                        renderArticlesFull(data);
+                        break;
+                    default:
+                        // Fallback to home if an invalid page is requested
+                        window.location.search = '';
+                        initRouter(data);
+                        break;
+                }
+            }
+            
+            // 5. Re-apply edit mode and hide loading
+            document.getElementById('loading-indicator').classList.add('hidden');
             if (isEditMode) {
                 document.querySelectorAll('.content-editable-field').forEach(el => {
                     el.setAttribute('contenteditable', 'true');
                 });
             }
         }
+
 
         /** Saves the current state of all editable fields back to Firestore. */
         async function saveContent() {
@@ -588,10 +847,10 @@
                     document.getElementById('user-id-display').textContent = userId || 'N/A';
                     console.log("Auth State Changed. User ID:", userId);
 
-                    // 2. Load Content (Public)
+                    // 2. Load Content (Public) - NOTE: Calling initRouter here instead of renderContent
                     onSnapshot(doc(db, CONTENT_PATH), (docSnap) => {
                         const content = docSnap.exists() ? docSnap.data() : initialContent;
-                        renderContent(content);
+                        initRouter(content);
                         // Write initial content if the document doesn't exist
                         if (!docSnap.exists()) {
                             setDoc(doc(db, CONTENT_PATH), initialContent).catch(e => console.error("Error writing initial content:", e));
@@ -599,7 +858,7 @@
                     }, (error) => {
                         console.error("Error listening to public content:", error);
                         // Render fallback content on error
-                        renderContent(initialContent);
+                        initRouter(initialContent);
                     });
 
                     // 3. Load Settings (Private)
@@ -634,7 +893,7 @@
                     <p class="text-red-500 text-sm mt-2">The application could not load its content database. Please check console for details.</p>
                 `;
                 console.error("Firebase initialization failed:", error);
-                renderContent(initialContent); // Render initial dummy content
+                initRouter(initialContent); // Render initial dummy content
             }
         }
 
