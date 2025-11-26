@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chenglin Pua - Personal Life</title>
+    <meta name="description" content="Chenglin Pua personal life and travel photo albums, documenting various experiences outside of academic research.">
+    <meta name="keywords" content="personal, travel, life, memories, gallery">
+    <meta name="author" content="Chenglin Pua">
+    <link rel="icon" href="https://placehold.co/32x32/1D4ED8/FFFFFF?text=P">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s;
+        }
+        /* Custom scrollbar style for modern browsers */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .content-editable-field:hover {
+            outline: 2px solid var(--theme-color-500, #3b82f6);
+            cursor: text;
+        }
+        
+        /* Magnification on Hover */
+        .magnify-on-hover {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+        }
+        .magnify-on-hover:hover {
+            transform: scale(1.05);
+            z-index: 10; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); 
+        }
+        
+        /* PPT Longstyle (4:1 Aspect Ratio) - Added to all subpages */
+        .aspect-16-4 {
+            aspect-ratio: 16 / 4;
+        }
+        .figure-longstyle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="shadow-lg sticky top-0 z-50 transition-colors duration-300" id="header" style="background-color: var(--theme-color-800, #1e40af);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Chenglin Pua</h1>
+            <nav class="hidden md:flex space-x-6">
+                <a href="../" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Home</a>
+                <a href="../research/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Research</a>
+                <a href="./" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Personal Life</a>
+                <a href="../gallery/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Gallery</a>
+                <a href="../articles/" class="text-white hover:text-opacity-80 transition duration-150 font-medium">Articles</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="md:grid md:grid-cols-4 md:gap-8">
+            
+            <div class="md:col-span-1 mb-8 md:mb-0">
+                <div id="profile-sidebar" class="sticky top-24 bg-white p-6 rounded-xl shadow-lg">
+                    <div id="profile-sidebar-content"></div>
+                </div>
+            </div>
+
+            <div class="md:col-span-3 space-y-20" id="main-content-wrapper">
+                
+                <div id="loading-indicator" class="text-center py-20">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto" style="border-color: var(--theme-color-600, #4f46e5);"></div>
+                    <p class="mt-4 text-lg text-gray-600">Loading personal page content...</p>
+                </div>
+
+                <section id="personal-section" class="scroll-mt-24"></section>
+                
+                <section id="research-section" class="scroll-mt-24 hidden"></section>
+                <section id="education-section" class="scroll-mt-24 hidden"></section>
+                <section id="presentations-section" class="scroll-mt-24 hidden"></section>
+                <section id="awards-section" class="scroll-mt-24 hidden"></section>
+                <section id="gallery-section" class="scroll-mt-24 hidden"></section>
+                <section id="articles-section" class="scroll-mt-24 hidden"></section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-16 py-8" style="background-color: var(--theme-color-800, #1e40af);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div id="social-links-container" class="flex justify-center space-x-6 mb-4">
+                </div>
+            <p class="text-white text-sm">&copy; <span id="current-year"></span> Chenglin Pua. Built with Firebase and Tailwind CSS.</p>
+        </div>
+    </footer>
+
+    <div id="config-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+            <h3 class="text-2xl font-bold mb-6" style="color: var(--theme-color-700, #3730a3);">Website Configuration</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="color-picker" class="block text-sm font-medium text-gray-700 mb-2">Primary Theme Color (Tailwind Color Scale)</label>
+                    <input type="color" id="color-picker" class="w-full h-10 border border-gray-300 rounded-lg p-1">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">User ID (For other users to find you)</label>
+                    <p id="user-id-display" class="break-all bg-gray-100 p-2 rounded-lg text-sm font-mono"></p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="saveThemeColor()" class="px-4 py-2 font-medium rounded-lg text-white" style="background-color: var(--theme-color-600, #4f46e5); hover-bg-color: var(--theme-color-700, #3730a3);">
+                    Save Settings
+                </button>
+                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="px-4 py-2 font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('debug');
+
+        // --- GLOBAL VARIABLES & INITIALIZATION (Identical to Main Page) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth, userId = null;
+        let isEditMode = false;
+        let themeColorHex = '#3B82F6'; 
+
+        const CONFIG_PATH = (uid) => `artifacts/${appId}/users/${uid}/website_settings/settings`;
+        const CONTENT_PATH = `artifacts/${appId}/public/data/website_content/main_data`;
+
+        // IMPORTANT: The initialContent block must be the updated version from the prerequisite step.
+        const initialContent = { 
+            profile: { /* ... */ }, research: { /* ... */ }, education: [ /* ... */ ], 
+            presentations: [ /* ... */ ], honors_awards: [ /* ... */ ], 
+            personal_life: [ /* ... (with figure_url_long) */ ], 
+            gallery_albums: [ /* ... */ ], articles: [ /* ... (with content for description) */ ], 
+            social_links: [ /* ... */ ] 
+        }; // Placeholder for the full updated object
+
+        // Placeholder for shared UI functions (toggleEditMode, renderProfileSidebar, renderSocialLinks, saveContent, applyThemeColor, saveThemeColor)
+        // You should copy these functions from the research/index.html file or the main index.html file.
+
+        // ====================================================================
+        // FULL CONTENT RENDER FUNCTION (PERSONAL)
+        // ====================================================================
+
+        function renderPersonalFull(data) {
+            const personalSection = document.getElementById('personal-section');
+            personalSection.innerHTML = `
+                <h2 class="text-4xl font-bold mb-10 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
+                <div class="space-y-16" id="personal-life-memories">
+                    ${data.personal_life.map((memory, i) => `
+                        <div class="bg-white p-8 rounded-xl shadow-xl"> 
+                            <h4 class="text-3xl font-bold mb-4 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
+                                id="personal-life-${i}-title" data-key="personal_life[${i}].title">
+                                ${memory.title}
+                            </h4>
+
+                            ${memory.figure_url_long ? `
+                                <div class="mb-6">
+                                    <div class="figure-longstyle w-full aspect-16-4 rounded-lg overflow-hidden shadow-xl magnify-on-hover">
+                                        <img src="${memory.figure_url_long}" alt="${memory.title} long-style figure" 
+                                            onerror="this.onerror=null; this.src='https://placehold.co/1200x300/1D4ED8/FFFFFF?text=TRAVEL+LONGSTYLE+FIGURE';" />
+                                    </div>
+                                    <p class="mt-2 text-sm text-gray-500">
+                                        Figure URL: <span class="content-editable-field break-all" data-key="personal_life[${i}].figure_url_long">${memory.figure_url_long || ''}</span>
+                                    </p>
+                                </div>
+                            ` : ''}
+
+                            <p class="text-gray-700 leading-relaxed mb-6 content-editable-field min-h-[50px]"
+                                id="personal-life-${i}-content" data-key="personal_life[${i}].content">
+                                ${memory.content}
+                            </p>
+                    
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6 border-t pt-4 border-gray-100">
+                                ${(memory.images || []).map(url => `
+                                    <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-cover aspect-square rounded-lg shadow-lg magnify-on-hover transition duration-300"
+                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                `).join('')}
+                            </div>
+                            <p class="mt-4 text-sm text-gray-500">
+                                Image URLs (Edit Mode, Comma-separated): <span class="content-editable-field break-all" data-key="personal_life[${i}].images">${(memory.images || []).join(', ')}</span>
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+
+        // ====================================================================
+        // PAGE INITIALIZATION (Specific to personal/index.html)
+        // ====================================================================
+
+        function initPage(data) {
+            if (!data) data = initialContent; 
+            
+            // 1. Render Global Components
+            renderProfileSidebar(data); 
+            renderSocialLinks(data);
+
+            // 2. Render only the FULL content for this page
+            document.getElementById('personal-section').classList.remove('hidden');
+            renderPersonalFull(data);
+            
+            // 3. Hide loading and apply edit mode
+            document.getElementById('loading-indicator').classList.add('hidden');
+            if (isEditMode) {
+                document.querySelectorAll('.content-editable-field').forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                    el.parentElement.classList.remove('hidden'); // Show hidden link fields
+                });
+            }
+        }
+        
+        // --- Remaining Shared Functions (Must be copied from main index.html) ---
+        // (toggleEditMode, renderProfileSidebar, renderSocialLinks, saveContent, applyThemeColor, saveThemeColor, initializeFirebase)
+        // ...
+        
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        // initializeFirebase(); // Uncomment this line and ensure the shared functions are present
+        window.saveThemeColor = saveThemeColor;
+        window.addEventListener('beforeunload', () => { if (isEditMode) { /* saveContent(); */ } });
+    </script>
+</body>
+</html>
