@@ -43,8 +43,8 @@
         }
         .figure-longstyle img {
             width: 100%;
-            height: 100%;
-            object-fit: cover; 
+            height: auto; /* MODIFICATION 2: Changed from 100% to auto for full height display */
+            object-fit: initial; /* MODIFICATION 2: Removed object-fit: cover to prevent cropping */
         }
     </style>
 </head>
@@ -188,7 +188,7 @@
                 { degree: "M.S. in Materials Science", school: "Tsinghua University", years: "2022 - 2025" },
                 { degree: "B.S. in Mechanical Engineering", school: "Shanghai Jiao Tong University", years: "2018 - 2022" }
             ],
-            presentations: [                
+            presentations: [             
                 { title: " Simulation analysis and optimization of protective wall against hydrogen combustion from liquified hydrogen storage tank on the offshore launching platform (Oral)", venue: "European Hydrogen Energy Conference, Bilbao Spain", date: "Mar 2024" },
                 { title: "xxx", venue: "CEBE 2023, Shanghai, China", date: "Jul 2023" }
             ],
@@ -196,6 +196,8 @@
                 { title: "Interview from China Daily", year: "2023" },
                 { title: "Outstanding Undergraduate Thesis", year: "2022" }
             ],
+            // MODIFICATION 1: New intro field added to initialContent
+            personal_life_intro: "Welcome to my personal life and travel photo albums! Outside of academic research, I enjoy traveling, capturing moments, and exploring new cultures. Here's a glimpse into my life experiences.", 
             // Updated to include 'content' and 'figure_url_long'
             personal_life: [
                 { 
@@ -292,8 +294,8 @@
             profileContainer.innerHTML = `
                 <div class="text-center">
                     <img src="${profileImageUrl}" alt="${profileName} Profile Picture" 
-                         class="w-24 h-24 rounded-full mx-auto object-cover mb-4 shadow-md" 
-                         onerror="this.onerror=null; this.src='https://placehold.co/96x96/1D4ED8/FFFFFF?text=CP';" />
+                             class="w-24 h-24 rounded-full mx-auto object-cover mb-4 shadow-md" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/96x96/1D4ED8/FFFFFF?text=CP';" />
                     
                     <h3 class="text-xl font-bold mb-1 content-editable-field" data-key="profile.name">
                         ${profileName}
@@ -411,10 +413,19 @@
 
         function renderPersonalFull(data) {
             const personalSection = document.getElementById('personal-section');
+            // MODIFICATION 1: Fetch introduction text
+            const introText = data.personal_life_intro || initialContent.personal_life_intro; 
+
             personalSection.innerHTML = `
                 <h2 class="text-4xl font-bold mb-10 text-center" style="color: var(--theme-color-700, #3730a3);">✈️ Personal Life & Travels</h2>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-16">
+                    <p class="text-lg text-gray-700 leading-relaxed content-editable-field" data-key="personal_life_intro">
+                        ${introText}
+                    </p>
+                </div>
                 <div class="space-y-16" id="personal-life-memories">
-                    ${data.personal_life.map((memory, i) => `
+                    ${(data.personal_life || []).map((memory, i) => `
                         <div class="bg-white p-8 rounded-xl shadow-xl"> 
                             <h4 class="text-3xl font-bold mb-4 content-editable-field" style="color: var(--theme-color-600, #4f46e5);"
                                 id="personal-life-${i}-title" data-key="personal_life[${i}].title">
@@ -423,9 +434,9 @@
 
                             ${memory.figure_url_long ? `
                                 <div class="mb-6">
-                                    <div class="figure-longstyle w-full h-full aspect-16-4 rounded-lg overflow-hidden shadow-xl magnify-on-hover">
+                                    <div class="figure-longstyle w-full rounded-lg overflow-hidden shadow-xl magnify-on-hover">
                                         <img src="${memory.figure_url_long}" alt="${memory.title} long-style figure" 
-                                            onerror="this.onerror=null; this.src='https://placehold.co/1200x300/1D4ED8/FFFFFF?text=TRAVEL+LONGSTYLE+FIGURE';" />
+                                             onerror="this.onerror=null; this.src='https://placehold.co/1200x300/1D4ED8/FFFFFF?text=TRAVEL+LONGSTYLE+FIGURE';" />
                                     </div>
                                     <p class="mt-2 text-sm text-gray-500 hidden">
                                         Figure URL: <span class="content-editable-field break-all" data-key="personal_life[${i}].figure_url_long">${memory.figure_url_long || ''}</span>
@@ -437,11 +448,11 @@
                                 id="personal-life-${i}-content" data-key="personal_life[${i}].content">
                                 ${memory.content}
                             </p>
-                    
+                            
                             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6 border-t pt-4 border-gray-100">
                                 ${(memory.images || []).map(url => `
                                     <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-cover aspect-square rounded-lg shadow-lg magnify-on-hover transition duration-300"
-                                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                         onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
                                 `).join('')}
                             </div>
                             <p class="mt-4 text-sm text-gray-500 hidden">
