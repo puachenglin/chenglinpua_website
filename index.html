@@ -434,13 +434,11 @@
                     ${data.research.sub_topics.map((topic, i) => `
                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
                             
-                                ${topic.figure_url_long ? `
+                            ${topic.figure_url_long ? `
                                 <div class="mb-4">
-                                    <a href="${topic.figure_url_long}" target="_blank" title="View full-size image">
-                                        <img src="${topic.figure_url_long}" alt="${topic.title} illustration" 
-                                            class="w-full h-full object-contain rounded-lg shadow-md magnify-on-hover cursor-pointer"
-                                            onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
-                                    </a>
+                                    <img src="${topic.figure_url_long}" alt="${topic.title} illustration" 
+                                        class="w-full h-full object-contain rounded-lg shadow-md magnify-on-hover"
+                                        onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
                                 </div>
                             ` : ''}
                     
@@ -498,8 +496,10 @@
                                         `;
                                     } else {
                                         return `
-                                            <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300"
-                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                            <a href="${url}" target="_blank" title="View full-size image">
+                                                <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300 cursor-pointer"
+                                                    onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                            </a>
                                         `;
                                     }
                                 }).join('')}
@@ -605,11 +605,13 @@
                 <div class="grid md:grid-cols-2 gap-8" id="research-sub-topics-preview">
                     ${data.research.sub_topics.slice(0, PREVIEW_COUNT).map((topic, i) => `
                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4" style="border-top-color: var(--theme-color-500, #3b82f6);">
-                            ${topic.figure_url_long ? `
+${topic.figure_url_long ? `
                                 <div class="mb-4">
-                                    <img src="${topic.figure_url_long}" alt="${topic.title} illustration" 
-                                        class="w-full h-full object-cover rounded-lg shadow-md magnify-on-hover" 
-                                        onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
+                                    <a href="${topic.figure_url_long}" target="_blank" title="View full-size image">
+                                        <img src="${topic.figure_url_long}" alt="${topic.title} illustration" 
+                                            class="w-full h-full object-contain rounded-lg shadow-md magnify-on-hover cursor-pointer"
+                                            onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
+                                    </a>
                                 </div>
                             ` : ''}
                             <h4 class="text-xl font-semibold mb-3" style="color: var(--theme-color-600, #4f46e5);">
@@ -643,10 +645,14 @@
                                 ${memory.content}
                             </p>
                     
-                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                                 ${(memory.images || []).slice(0, 4).map(item => {
                                     const url = typeof item === 'object' && item.url ? item.url : item;
-                                    return `<img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />`;
+                                    return `
+                                        <a href="${url}" target="_blank" title="View full-size image">
+                                            <img src="${url}" alt="${memory.title} media" class="w-full h-auto object-contain rounded-lg shadow-lg magnify-on-hover transition duration-300" />
+                                        </a>
+                                    `; // <--- ADDED <a> TAG HERE
                                 }).join('')}
                             </div>
                         </div>
@@ -691,9 +697,11 @@
                                         `;
                                     } else {
                                         return `
-                                            <img src="${url}" alt="${album.title} media" class="w-full h-48 object-cover rounded-lg shadow-lg magnify-on-hover transition duration-300" 
-                                                onerror="this.onerror=null; this.src='https://placehold.co/400x192/EF4444/FFFFFF?text=Media+Load+Error';" />
-                                        `;
+                                            <a href="${url}" target="_blank" title="View full-size image">
+                                                <img src="${url}" alt="${album.title} media" class="w-full h-48 object-cover rounded-lg shadow-lg magnify-on-hover transition duration-300" 
+                                                    onerror="this.onerror=null; this.src='https://placehold.co/400x192/EF4444/FFFFFF?text=Media+Load+Error';" />
+                                            </a>
+                                        `; // <--- ADDED <a> TAG HERE
                                     }
                                 }).join('')}
                             </div>
