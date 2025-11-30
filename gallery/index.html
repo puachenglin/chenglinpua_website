@@ -399,7 +399,7 @@
         // FULL CONTENT RENDER FUNCTION (GALLERY)
         // ====================================================================
 
-        function renderGalleryFull(data) {
+function renderGalleryFull(data) {
             const gallerySection = document.getElementById('gallery-section');
             gallerySection.innerHTML = `
                 <h2 class="text-4xl font-bold mb-10 text-center" style="color: var(--theme-color-700, #3730a3);">🖼️ Gallery & Media (All Albums)</h2>
@@ -433,9 +433,12 @@
                                             </div>
                                         `;
                                     } else {
+                                        // MODIFICATION: Wrap the image in an <a> tag
                                         return `
-                                            <img src="${url}" alt="${album.title} photo" class="w-full h-auto object-cover aspect-square rounded-lg shadow-lg magnify-on-hover transition duration-300"
-                                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Image+Load+Error';" />
+                                            <a href="${url}" target="_blank" rel="noopener noreferrer" class="block">
+                                                <img src="${url}" alt="${album.title} photo" class="w-full h-auto object-cover aspect-square rounded-lg shadow-lg magnify-on-hover transition duration-300"
+                                                    onerror="this.onerror=null; this.src='https://placehold.co/400x400/EF4444/FFFFFF?text=Image+Load+Error';" />
+                                            </a>
                                         `;
                                     }
                                 }).join('')}
