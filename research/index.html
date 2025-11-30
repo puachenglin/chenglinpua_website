@@ -445,13 +445,13 @@ function renderResearchFull(data) {
                                 ${topic.content}
                             </p>
 
-                            ${topic.figure_url_long ? `
-                                <div class="mb-6">
-                                    <h5 class="text-lg font-semibold mb-2 text-gray-700"></h5>
-                                    <div class="figure-longstyle w-full rounded-lg overflow-hidden shadow-xl magnify-on-hover">
-                                        <img src="${topic.figure_url_long}" alt="${topic.title} long-style figure" 
-                                            onerror="this.onerror=null; this.src='https://placehold.co/1200x300/1D4ED8/FFFFFF?text=PPT+LONGSTYLE+FIGURE';" />
-                                    </div>
+${topic.figure_url_long ? `
+                                <div class="mb-4">
+                                    <a href="${topic.figure_url_long}" target="_blank" title="View full-size research illustration">
+                                        <img src="${topic.figure_url_long}" alt="${topic.title} illustration" 
+                                            class="w-full h-full object-contain rounded-lg shadow-md magnify-on-hover cursor-pointer"
+                                            onerror="this.onerror=null; this.src='https://placehold.co/600x160/1D4ED8/FFFFFF?text=Image+for+Topic';" />
+                                    </a>
                                 </div>
                             ` : ''}
 
@@ -459,13 +459,15 @@ function renderResearchFull(data) {
                                 <div class="mb-6 border-t pt-4 border-gray-100">
                                     <h5 class="text-lg font-semibold mb-2 text-gray-700">Supplementary Images</h5>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        ${topic.figure_urls_supplementary.map((url, j) => `
-                                            <div class="w-full">
-                                                <img src="${url}" alt="${topic.title} supplementary image ${j+1}" 
-                                                    class="w-full h-auto rounded-lg shadow-md magnify-on-hover" 
-                                                    onerror="this.onerror=null; this.src='https://placehold.co/400x300/FACC15/000000?text=SUPPLEMENTARY+IMG';" />
-                                            </div>
-                                        `).join('')}
+${topic.figure_urls_supplementary.map((url, j) => `
+    <div class="w-full">
+        <a href="${url}" target="_blank" title="View full-size supplementary image">
+            <img src="${url}" alt="${topic.title} supplementary image ${j+1}" 
+                class="w-full h-auto rounded-lg shadow-md magnify-on-hover cursor-pointer" 
+                onerror="this.onerror=null; this.src='https://placehold.co/400x300/FACC15/000000?text=SUPPLEMENTARY+IMG';" />
+        </a>
+    </div>
+`).join('')}
                                     </div>
                                 </div>
                             ` : ''}
